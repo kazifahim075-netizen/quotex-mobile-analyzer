@@ -1,1681 +1,251 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Screenshot Analyzer V7</title>
-
-<style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  padding:16px;
-  background:#07111a;
-  color:#fff;
-  font-family:Arial,sans-serif;
-}
-
-.container{
-  max-width:760px;
-  margin:auto;
-}
-
-.card{
-  background:#111c27;
-  border:1px solid #293b4d;
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:18px;
-}
-
-h1{
-  margin:0 0 12px;
-  font-size:25px;
-}
-
-.description{
-  color:#a9b8c9;
-  line-height:1.6;
-  font-size:14px;
-}
-
-input[type=file]{
-  width:100%;
-  margin:18px 0;
-  font-size:16px;
-}
-
-#preview{
-  display:none;
-  width:100%;
-  border-radius:14px;
-  border:2px solid #33485e;
-  margin:10px 0 15px;
-}
-
-#status{
-  display:none;
-  padding:10px;
-  margin:10px 0;
-  border-radius:10px;
-  background:#172636;
-  color:#9fc3e8;
-  font-size:13px;
-}
-
-button{
-  width:100%;
-  padding:17px;
-  border:0;
-  border-radius:14px;
-  background:#69a4fa;
-  color:#08111c;
-  font-size:19px;
-  font-weight:bold;
-}
-
-button:disabled{
-  opacity:.45;
-}
-
-#result{
-  display:none;
-}
-
-.signalBox{
-  text-align:center;
-  background:#172432;
-  padding:22px;
-  border-radius:16px;
-}
-
-#signal{
-  font-size:42px;
-  font-weight:900;
-  margin:10px 0;
-}
-
-.up{color:#4ce08a}
-.down{color:#ff6464}
-.yellow{color:#ffd166}
-
-.small{
-  color:#9fb0c2;
-  font-size:13px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:14px;
-}
-
-.box{
-  background:#172432;
-  border-radius:13px;
-  padding:13px;
-}
-
-.label{
-  color:#95a9be;
-  font-size:12px;
-}
-
-.value{
-  font-size:17px;
-  font-weight:bold;
-  margin-top:5px;
-}
-
-.tag{
-  display:inline-block;
-  background:#1d3042;
-  border-radius:30px;
-  padding:7px 10px;
-  margin:4px;
-  font-size:12px;
-}
-
-.warning{
-  color:#8799ac;
-  font-size:12px;
-  line-height:1.6;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="card">
-
-<h1>📸 Screenshot Analyzer V7</h1>
-
-<div class="description">
-Accuracy-focused mode। Strong confluence না থাকলে UP/DOWN না দিয়ে NO TRADE দেখাবে।
-</div>
-
-<input id="fileInput" type="file" accept="image/*">
-
-<div id="status">Waiting...</div>
-
-<img id="preview" alt="Screenshot">
-
-<button id="analyzeBtn" disabled>
-DEEP ANALYZE
-</button>
-
-</div>
-
-
-<div id="result" class="card">
-
-<div class="signalBox">
-
-<div class="small">NEXT CANDLE BIAS</div>
-
-<div id="signal">--</div>
-
-<div id="strength">
-Confidence: --/100
-</div>
-
-</div>
-
-
-<div class="grid">
-
-<div class="box">
-<div class="label">Candles</div>
-<div id="count" class="value">--</div>
-</div>
-
-<div class="box">
-<div class="label">Quality</div>
-<div id="quality" class="value">--</div>
-</div>
-
-<div class="box">
-<div class="label">Trend</div>
-<div id="trend" class="value">--</div>
-</div>
-
-<div class="box">
-<div class="label">Momentum</div>
-<div id="momentum" class="value">--</div>
-</div>
-
-<div class="box">
-<div class="label">Structure</div>
-<div id="structure" class="value">--</div>
-</div>
-
-<div class="box">
-<div class="label">Pressure</div>
-<div id="pressure" class="value">--</div>
-</div>
-
-<div class="box">
-<div class="label">Bull Score</div>
-<div id="bull" class="value up">--</div>
-</div>
-
-<div class="box">
-<div class="label">Bear Score</div>
-<div id="bear" class="value down">--</div>
-</div>
-
-</div>
-
-<h3>Confirmations</h3>
-<div id="confirmations"></div>
-
-</div>
-
-
-<div class="card warning">
-V7 heuristic screenshot analyzer। Confidence score guaranteed probability না।
-Weak বা conflicting market হলে NO TRADE দেখানোই intentional।
-</div>
-
-</div>
-
-<canvas id="canvas" style="display:none"></canvas>
-
-
 <script>
 const fileInput = document.getElementById("fileInput");
 const preview = document.getElementById("preview");
 const analyzeBtn = document.getElementById("analyzeBtn");
 const statusBox = document.getElementById("status");
 const canvas = document.getElementById("canvas");
-
-const ctx = canvas.getContext("2d",{
-  willReadFrequently:true
-});
+const ctx = canvas.getContext("2d", { willReadFrequently:true });
 
 let imageReady = false;
-let objectURL = null;
 
+fileInput.addEventListener("change", function () {
+  imageReady = false;
+  analyzeBtn.disabled = true;
 
-/* =========================
-UPLOAD
-========================= */
+  const file = this.files && this.files[0];
 
-fileInput.addEventListener("click",function(){
-  this.value="";
-});
+  statusBox.style.display = "block";
 
-fileInput.addEventListener("change",function(){
-
-  imageReady=false;
-  analyzeBtn.disabled=true;
-
-  statusBox.style.display="block";
-  statusBox.textContent="Screenshot loading...";
-
-  if(!this.files || !this.files.length){
-    statusBox.textContent="No image selected";
+  if (!file) {
+    statusBox.textContent = "❌ No screenshot selected";
     return;
   }
 
-  const file=this.files[0];
+  statusBox.textContent = "⏳ Screenshot loading...";
 
-  if(file.type && !file.type.startsWith("image/")){
-    statusBox.textContent="❌ Image file select করো";
-    return;
-  }
+  const reader = new FileReader();
 
-  if(objectURL){
-    URL.revokeObjectURL(objectURL);
-  }
+  reader.onload = function (e) {
+    const img = new Image();
 
-  objectURL=URL.createObjectURL(file);
+    img.onload = function () {
+      preview.src = e.target.result;
+      preview.style.display = "block";
 
-  preview.onload=function(){
+      imageReady = true;
+      analyzeBtn.disabled = false;
 
-    if(!preview.naturalWidth || !preview.naturalHeight){
-      statusBox.textContent="❌ Invalid screenshot";
-      return;
-    }
+      statusBox.textContent =
+        "✅ Screenshot loaded — DEEP ANALYZE চাপো";
+    };
 
-    preview.style.display="block";
-    analyzeBtn.disabled=false;
-    imageReady=true;
+    img.onerror = function () {
+      imageReady = false;
+      analyzeBtn.disabled = true;
+      statusBox.textContent =
+        "❌ Screenshot load হয়নি";
+    };
 
-    statusBox.textContent=
-    "✅ Screenshot loaded — ready";
+    img.src = e.target.result;
   };
 
-  preview.onerror=function(){
-
-    imageReady=false;
-    analyzeBtn.disabled=true;
-
-    statusBox.textContent=
-    "❌ Screenshot load হয়নি";
+  reader.onerror = function () {
+    statusBox.textContent =
+      "❌ File read error";
   };
 
-  preview.src=objectURL;
+  reader.readAsDataURL(file);
 });
 
 
-/* =========================
-BUTTON
-========================= */
+analyzeBtn.addEventListener("click", function () {
 
-analyzeBtn.addEventListener("click",function(){
-
-  if(!imageReady){
+  if (!imageReady) {
     alert("আগে screenshot select করো");
     return;
   }
 
-  analyzeBtn.disabled=true;
-  analyzeBtn.textContent="ANALYZING...";
+  analyzeBtn.disabled = true;
+  analyzeBtn.textContent = "ANALYZING...";
 
-  statusBox.textContent="🔍 Deep analysis চলছে...";
+  statusBox.style.display = "block";
+  statusBox.textContent = "🔍 Deep analysis চলছে...";
 
-  setTimeout(function(){
+  setTimeout(function () {
 
-    try{
-      analyzeScreenshot();
-      statusBox.textContent="✅ Analysis complete";
-    }
-    catch(err){
+    try {
+      runSimpleAnalysis();
+    } catch (err) {
       console.error(err);
-      statusBox.textContent="❌ "+err.message;
+      statusBox.textContent =
+        "❌ Analysis error: " + err.message;
     }
 
-    analyzeBtn.disabled=false;
-    analyzeBtn.textContent="DEEP ANALYZE";
+    analyzeBtn.disabled = false;
+    analyzeBtn.textContent = "DEEP ANALYZE";
 
-  },100);
-
+  }, 150);
 });
 
 
-/* =========================
-MAIN ANALYSIS
-========================= */
+function runSimpleAnalysis() {
 
-function analyzeScreenshot(){
+  const W = preview.naturalWidth;
+  const H = preview.naturalHeight;
 
-  const originalW=preview.naturalWidth;
-  const originalH=preview.naturalHeight;
-
-  if(!originalW || !originalH){
-    throw new Error("Invalid image");
+  if (!W || !H) {
+    throw new Error("Invalid screenshot size");
   }
 
+  const targetW = Math.min(700, W);
+  const scale = targetW / W;
 
-  /*
-  Chart-focused area.
-  Remove browser/header/bottom UI.
-  */
-
-  const sx=Math.round(originalW*.02);
-  const sy=Math.round(originalH*.08);
-
-  const sw=Math.round(originalW*.96);
-  const sh=Math.round(originalH*.62);
-
-
-  const targetW=Math.min(1000,sw);
-  const scale=targetW/sw;
-
-
-  canvas.width=Math.round(sw*scale);
-  canvas.height=Math.round(sh*scale);
-
-
-  ctx.clearRect(
-    0,0,
-    canvas.width,
-    canvas.height
-  );
-
+  canvas.width = Math.round(W * scale);
+  canvas.height = Math.round(H * scale);
 
   ctx.drawImage(
     preview,
-    sx,sy,sw,sh,
-    0,0,
+    0, 0,
     canvas.width,
     canvas.height
   );
 
-
-  const W=canvas.width;
-  const H=canvas.height;
-
-
-  const img=
-  ctx.getImageData(
-    0,0,W,H
+  const imageData = ctx.getImageData(
+    0, 0,
+    canvas.width,
+    canvas.height
   );
 
+  const data = imageData.data;
 
-  const data=img.data;
+  let green = 0;
+  let red = 0;
 
+  for (let i = 0; i < data.length; i += 4) {
 
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
 
-/* =========================
-COLOR CLASSIFIER
-========================= */
+    if (
+      g > r * 1.12 &&
+      g > b * 0.95 &&
+      g > 80
+    ) {
+      green++;
+    }
 
-function classify(r,g,b){
-
-  const max=Math.max(r,g,b);
-  const min=Math.min(r,g,b);
-
-  if(max<60) return 0;
-
-  if(max-min<22) return 0;
-
-
-  /*
-  green / cyan candles
-  */
-  if(
-    g>r*1.10 &&
-    g>b*.88 &&
-    g>85
-  ){
-    return 1;
-  }
-
-
-  /*
-  red / orange-red candles
-  */
-  if(
-    r>g*1.10 &&
-    r>b*.90 &&
-    r>90
-  ){
-    return -1;
-  }
-
-
-  return 0;
-}
-
-
-
-/* =========================
-SCAN COLUMNS
-========================= */
-
-const cols=[];
-
-for(let x=0;x<W;x++){
-
-  let green=0;
-  let red=0;
-
-  let top=H;
-  let bottom=-1;
-
-
-  for(
-    let y=Math.round(H*.03);
-    y<Math.round(H*.96);
-    y++
-  ){
-
-    const i=(y*W+x)*4;
-
-    const type=classify(
-      data[i],
-      data[i+1],
-      data[i+2]
-    );
-
-
-    if(type!==0){
-
-      if(type===1) green++;
-      else red++;
-
-      if(y<top) top=y;
-      if(y>bottom) bottom=y;
+    if (
+      r > g * 1.12 &&
+      r > b * 0.95 &&
+      r > 80
+    ) {
+      red++;
     }
   }
 
+  let signal = "NO TRADE";
+  let confidence = 0;
 
-  cols.push({
-    x,
-    green,
-    red,
-    total:green+red,
-    top,
-    bottom
-  });
+  const total = green + red;
 
-}
+  if (total > 0) {
 
+    const diff = Math.abs(green - red);
+    confidence = Math.round((diff / total) * 100);
 
-
-/* =========================
-DYNAMIC THRESHOLD
-========================= */
-
-const activeCounts=
-cols
-.filter(c=>c.total>0)
-.map(c=>c.total)
-.sort((a,b)=>a-b);
-
-
-let median=0;
-
-if(activeCounts.length){
-
-  median=
-  activeCounts[
-    Math.floor(activeCounts.length/2)
-  ];
-}
-
-
-const minPixels=
-Math.max(
-  3,
-  median*.22
-);
-
-
-
-/* =========================
-GROUP ACTIVE COLUMNS
-========================= */
-
-const groups=[];
-let current=null;
-
-
-for(let x=0;x<cols.length;x++){
-
-  const c=cols[x];
-
-  const height=
-  c.bottom>=0
-  ?c.bottom-c.top
-  :0;
-
-
-  const valid=
-  c.total>=minPixels &&
-  height>=4 &&
-  height<H*.48;
-
-
-  if(valid){
-
-    if(!current){
-
-      current={
-        start:x,
-        end:x,
-        green:c.green,
-        red:c.red,
-        top:c.top,
-        bottom:c.bottom
-      };
-
-    }else if(
-      x-current.end<=2
-    ){
-
-      current.end=x;
-
-      current.green+=c.green;
-      current.red+=c.red;
-
-      current.top=
-      Math.min(
-        current.top,
-        c.top
-      );
-
-      current.bottom=
-      Math.max(
-        current.bottom,
-        c.bottom
-      );
-
-    }else{
-
-      groups.push(current);
-
-      current={
-        start:x,
-        end:x,
-        green:c.green,
-        red:c.red,
-        top:c.top,
-        bottom:c.bottom
-      };
+    if (
+      green > red * 1.35 &&
+      confidence >= 20
+    ) {
+      signal = "UP";
     }
 
-  }else if(current){
-
-    groups.push(current);
-    current=null;
-  }
-}
-
-
-if(current){
-  groups.push(current);
-}
-
-
-
-/* =========================
-FILTER UI ELEMENTS
-========================= */
-
-let candles=[];
-
-
-groups.forEach(g=>{
-
-  const width=
-  g.end-g.start+1;
-
-  const height=
-  g.bottom-g.top+1;
-
-  const total=
-  g.green+g.red;
-
-
-  if(
-    width>=1 &&
-    width<Math.max(32,W*.04) &&
-    height>=5 &&
-    height<H*.44 &&
-    total>=8
-  ){
-
-    const dir=
-    g.green>=g.red
-    ?1
-    :-1;
-
-
-    candles.push({
-
-      x:(g.start+g.end)/2,
-
-      dir,
-
-      high:g.top,
-
-      low:g.bottom,
-
-      range:
-      Math.max(
-        1,
-        g.bottom-g.top
-      ),
-
-      purity:
-      Math.abs(
-        g.green-g.red
-      )/
-      Math.max(
-        1,total
-      ),
-
-      pixels:total
-
-    });
-
-  }
-
-});
-
-
-candles.sort(
-  (a,b)=>a.x-b.x
-);
-
-
-
-/* =========================
-REMOVE FAKE / ISOLATED GROUPS
-========================= */
-
-if(candles.length>=5){
-
-  const gaps=[];
-
-  for(let i=1;i<candles.length;i++){
-
-    gaps.push(
-      candles[i].x-
-      candles[i-1].x
-    );
-  }
-
-  gaps.sort((a,b)=>a-b);
-
-
-  const normalGap=
-  gaps[
-    Math.floor(gaps.length/2)
-  ] || 5;
-
-
-  const clusters=[];
-
-  let cluster=[
-    candles[0]
-  ];
-
-
-  for(let i=1;i<candles.length;i++){
-
-    const gap=
-    candles[i].x-
-    candles[i-1].x;
-
-
-    if(gap<=normalGap*2.8){
-
-      cluster.push(
-        candles[i]
-      );
-
-    }else{
-
-      clusters.push(
-        cluster
-      );
-
-      cluster=[
-        candles[i]
-      ];
+    if (
+      red > green * 1.35 &&
+      confidence >= 20
+    ) {
+      signal = "DOWN";
     }
   }
-
-
-  clusters.push(cluster);
-
-
-  clusters.sort(
-    (a,b)=>
-    b.length-a.length
-  );
-
-
-  candles=clusters[0];
-}
-
-
-if(candles.length>60){
-  candles=candles.slice(-60);
-}
-
-
-
-/* =========================
-LOW DATA
-========================= */
-
-if(candles.length<8){
 
   showResult({
-
-    signal:"NO TRADE",
-    confidence:0,
-    count:candles.length,
-    quality:"POOR",
-    trend:"UNKNOWN",
-    momentum:"UNKNOWN",
-    structure:"UNKNOWN",
-    pressure:"UNKNOWN",
-    bull:0,
-    bear:0,
-
-    reasons:[
-      "Reliable candle detection কম",
-      "Chart zoom করে screenshot নাও",
-      "Buttons/UI কম রেখে chart area বড় রাখো"
+    signal: signal,
+    confidence: confidence,
+    count: total,
+    quality:
+      total > 1000 ? "HIGH" :
+      total > 300 ? "MEDIUM" :
+      "LOW",
+    trend: signal === "UP" ? "BULLISH" :
+           signal === "DOWN" ? "BEARISH" :
+           "MIXED",
+    momentum: signal === "UP" ? "BULLISH" :
+              signal === "DOWN" ? "BEARISH" :
+              "MIXED",
+    structure: "AUTO",
+    pressure: signal,
+    bull: green,
+    bear: red,
+    reasons: [
+      "Screenshot successfully analyzed",
+      "Green pixels: " + green,
+      "Red pixels: " + red
     ]
-
   });
 
-  return;
+  statusBox.textContent = "✅ Analysis complete";
 }
 
 
+function showResult(r) {
 
-/* =========================
-STATS
-========================= */
+  const resultBox = document.getElementById("result");
+  const signal = document.getElementById("signal");
 
-const ranges=
-candles.map(c=>c.range);
+  resultBox.style.display = "block";
 
+  signal.textContent = r.signal;
+  signal.className = "";
 
-const avgRange=
-ranges.reduce(
-  (a,b)=>a+b,0
-)/
-ranges.length;
-
-
-const sortedRanges=
-[...ranges].sort(
-  (a,b)=>a-b
-);
-
-
-const medianRange=
-sortedRanges[
-  Math.floor(
-    sortedRanges.length/2
-  )
-] || 1;
-
-
-let bull=0;
-let bear=0;
-
-const reasons=[];
-
-
-
-/* =========================
-1. TREND
-========================= */
-
-function mid(c){
-  return(
-    c.high+c.low
-  )/2;
-}
-
-
-const trendSet=
-candles.slice(
-  -Math.min(
-    20,
-    candles.length
-  )
-);
-
-
-const third=
-Math.max(
-  3,
-  Math.floor(
-    trendSet.length/3
-  )
-);
-
-
-const oldAvg=
-trendSet
-.slice(0,third)
-.reduce(
-  (s,c)=>s+mid(c),0
-)
-/third;
-
-
-const newAvg=
-trendSet
-.slice(-third)
-.reduce(
-  (s,c)=>s+mid(c),0
-)
-/third;
-
-
-/*
-screen Y lower = price higher
-*/
-
-const trendMove=
-(oldAvg-newAvg)/
-Math.max(
-  1,
-  medianRange
-);
-
-
-let trend="SIDEWAYS";
-
-
-if(trendMove>0.65){
-
-  trend="BULLISH";
-  bull+=24;
-
-  reasons.push(
-    "Strong rising price structure"
-  );
-
-}
-else if(trendMove<-0.65){
-
-  trend="BEARISH";
-  bear+=24;
-
-  reasons.push(
-    "Strong falling price structure"
-  );
-
-}
-else{
-
-  reasons.push(
-    "Trend weak / sideways"
-  );
-}
-
-
-
-/* =========================
-2. CANDLE DIRECTION RATIO
-========================= */
-
-const last12=
-candles.slice(-12);
-
-
-let greens=0;
-let reds=0;
-
-
-last12.forEach(c=>{
-
-  if(c.dir===1)
-    greens++;
-
-  else
-    reds++;
-
-});
-
-
-if(greens>=8){
-
-  bull+=15;
-
-  reasons.push(
-    "Recent candles mostly bullish"
-  );
-
-}
-else if(reds>=8){
-
-  bear+=15;
-
-  reasons.push(
-    "Recent candles mostly bearish"
-  );
-}
-
-
-
-/* =========================
-3. MOMENTUM
-========================= */
-
-const recent=
-candles.slice(-6);
-
-
-let greenPower=0;
-let redPower=0;
-
-
-recent.forEach(
-(c,index)=>{
-
-  const recency=
-  1+index*.35;
-
-
-  const power=
-  (
-    c.range/
-    Math.max(
-      1,
-      medianRange
-    )
-  )
-  *
-  (
-    .6+c.purity
-  )
-  *
-  recency;
-
-
-  if(c.dir===1)
-    greenPower+=power;
-
-  else
-    redPower+=power;
-
-});
-
-
-let momentum="MIXED";
-
-
-if(
-  greenPower>
-  redPower*1.35
-){
-
-  momentum="BULLISH";
-  bull+=22;
-
-  reasons.push(
-    "Bullish momentum dominant"
-  );
-
-}
-else if(
-  redPower>
-  greenPower*1.35
-){
-
-  momentum="BEARISH";
-  bear+=22;
-
-  reasons.push(
-    "Bearish momentum dominant"
-  );
-
-}
-else{
-
-  reasons.push(
-    "Momentum conflict"
-  );
-}
-
-
-
-/* =========================
-4. STRUCTURE HH HL / LH LL
-========================= */
-
-let structure="MIXED";
-
-
-if(candles.length>=12){
-
-  const older=
-  candles.slice(-12,-6);
-
-  const newer=
-  candles.slice(-6);
-
-
-  const avgHigh=
-  arr=>
-  arr.reduce(
-    (s,c)=>s+c.high,0
-  )/
-  arr.length;
-
-
-  const avgLow=
-  arr=>
-  arr.reduce(
-    (s,c)=>s+c.low,0
-  )/
-  arr.length;
-
-
-  const oldH=avgHigh(older);
-  const oldL=avgLow(older);
-
-  const newH=avgHigh(newer);
-  const newL=avgLow(newer);
-
-
-  const tolerance=
-  medianRange*.18;
-
-
-  if(
-    newH<oldH-tolerance &&
-    newL<oldL-tolerance
-  ){
-
-    structure="HH / HL";
-
-    bull+=20;
-
-    reasons.push(
-      "Bullish HH/HL structure"
-    );
-
-  }
-  else if(
-    newH>oldH+tolerance &&
-    newL>oldL+tolerance
-  ){
-
-    structure="LH / LL";
-
-    bear+=20;
-
-    reasons.push(
-      "Bearish LH/LL structure"
-    );
-
-  }
-  else{
-
-    structure="TRANSITION";
-
-    reasons.push(
-      "Structure not clean"
-    );
-  }
-}
-
-
-
-/* =========================
-5. LAST 3 PRESSURE
-========================= */
-
-const last3=
-candles.slice(-3);
-
-
-let pressureForce=0;
-
-
-last3.forEach(
-(c,index)=>{
-
-  const weight=
-  1+index*.8;
-
-
-  const force=
-  (
-    c.range/
-    Math.max(
-      1,
-      medianRange
-    )
-  )
-  *
-  (.7+c.purity)
-  *
-  weight;
-
-
-  pressureForce+=
-  c.dir===1
-  ?force
-  :-force;
-
-});
-
-
-let pressure="MIXED";
-
-
-if(pressureForce>1.8){
-
-  pressure="BULLISH";
-
-  bull+=28;
-
-  reasons.push(
-    "Latest candle pressure bullish"
-  );
-
-}
-else if(pressureForce<-1.8){
-
-  pressure="BEARISH";
-
-  bear+=28;
-
-  reasons.push(
-    "Latest candle pressure bearish"
-  );
-
-}
-else{
-
-  reasons.push(
-    "Latest candles conflicting"
-  );
-}
-
-
-
-/* =========================
-6. LAST CANDLE QUALITY
-========================= */
-
-const last=
-candles[
-  candles.length-1
-];
-
-
-if(
-  last.range >
-  medianRange*1.15 &&
-  last.purity>.35
-){
-
-  if(last.dir===1){
-
-    bull+=10;
-
-    reasons.push(
-      "Strong final bullish candle"
-    );
-
-  }else{
-
-    bear+=10;
-
-    reasons.push(
-      "Strong final bearish candle"
-    );
-  }
-}
-
-
-
-/* =========================
-7. VOLATILITY PENALTY
-========================= */
-
-let variance=0;
-
-
-ranges.forEach(r=>{
-
-  variance+=
-  Math.pow(
-    r-avgRange,
-    2
-  );
-
-});
-
-
-variance/=ranges.length;
-
-
-const deviation=
-Math.sqrt(
-  variance
-);
-
-
-const volatility=
-deviation/
-Math.max(
-  1,
-  avgRange
-);
-
-
-if(volatility>.85){
-
-  bull*=.78;
-  bear*=.78;
-
-  reasons.push(
-    "Extreme volatility — confidence reduced"
-  );
-}
-
-
-
-/* =========================
-8. CONFLUENCE BONUS
-========================= */
-
-const bullConfirmations=[
-  trend==="BULLISH",
-  momentum==="BULLISH",
-  structure==="HH / HL",
-  pressure==="BULLISH"
-]
-.filter(Boolean)
-.length;
-
-
-const bearConfirmations=[
-  trend==="BEARISH",
-  momentum==="BEARISH",
-  structure==="LH / LL",
-  pressure==="BEARISH"
-]
-.filter(Boolean)
-.length;
-
-
-if(bullConfirmations>=3){
-
-  bull+=20;
-
-  reasons.push(
-    "Bullish multi-factor confluence"
-  );
-}
-
-
-if(bearConfirmations>=3){
-
-  bear+=20;
-
-  reasons.push(
-    "Bearish multi-factor confluence"
-  );
-}
-
-
-
-/* =========================
-9. CONFLICT PENALTY
-========================= */
-
-if(
-  trend==="BULLISH" &&
-  pressure==="BEARISH"
-){
-
-  bull*=.72;
-  bear*=.85;
-
-  reasons.push(
-    "Trend vs latest candles conflict"
-  );
-}
-
-
-if(
-  trend==="BEARISH" &&
-  pressure==="BULLISH"
-){
-
-  bear*=.72;
-  bull*=.85;
-
-  reasons.push(
-    "Trend vs latest candles conflict"
-  );
-}
-
-
-
-/* =========================
-CONFIDENCE
-========================= */
-
-bull=Math.round(bull);
-bear=Math.round(bear);
-
-
-const total=
-bull+bear;
-
-
-const difference=
-Math.abs(
-  bull-bear
-);
-
-
-const separation=
-total>0
-?difference/total
-:0;
-
-
-const candleQuality=
-Math.min(
-  1,
-  candles.length/25
-);
-
-
-const dominant=
-Math.max(
-  bull,bear
-);
-
-
-let confidence=
-Math.round(
-
-  separation*55
-
-  +
-
-  Math.min(
-    1,
-    dominant/100
-  )*30
-
-  +
-
-  candleQuality*15
-
-);
-
-
-confidence=
-Math.max(
-  0,
-  Math.min(
-    100,
-    confidence
-  )
-);
-
-
-
-/* =========================
-STRICT SIGNAL FILTER
-========================= */
-
-let signal="NO TRADE";
-
-
-const scoreGap=
-Math.abs(
-  bull-bear
-);
-
-
-/*
-UP requires strong agreement
-*/
-
-if(
-  bull>=70 &&
-  bull>bear &&
-  scoreGap>=28 &&
-  confidence>=68 &&
-  bullConfirmations>=3 &&
-  pressure!=="BEARISH"
-){
-
-  signal="UP";
-}
-
-
-/*
-DOWN requires strong agreement
-*/
-
-if(
-  bear>=70 &&
-  bear>bull &&
-  scoreGap>=28 &&
-  confidence>=68 &&
-  bearConfirmations>=3 &&
-  pressure!=="BULLISH"
-){
-
-  signal="DOWN";
-}
-
-
-
-/* =========================
-QUALITY
-========================= */
-
-let quality="LOW";
-
-
-if(
-  candles.length>=20 &&
-  confidence>=75
-){
-
-  quality="HIGH";
-
-}
-else if(
-  candles.length>=12 &&
-  confidence>=55
-){
-
-  quality="MEDIUM";
-}
-
-
-
-/* =========================
-NO TRADE REASONS
-========================= */
-
-if(signal==="NO TRADE"){
-
-  if(confidence<68){
-
-    reasons.push(
-      "Confidence threshold pass হয়নি"
-    );
-
+  if (r.signal === "UP") {
+    signal.classList.add("up");
+  } else if (r.signal === "DOWN") {
+    signal.classList.add("down");
+  } else {
+    signal.classList.add("yellow");
   }
 
-  if(scoreGap<28){
+  document.getElementById("strength").textContent =
+    "Confidence: " + r.confidence + "/100";
 
-    reasons.push(
-      "Bull/Bear score separation কম"
-    );
+  document.getElementById("count").textContent = r.count;
+  document.getElementById("quality").textContent = r.quality;
+  document.getElementById("trend").textContent = r.trend;
+  document.getElementById("momentum").textContent = r.momentum;
+  document.getElementById("structure").textContent = r.structure;
+  document.getElementById("pressure").textContent = r.pressure;
+  document.getElementById("bull").textContent = r.bull;
+  document.getElementById("bear").textContent = r.bear;
 
-  }
+  const confirmations =
+    document.getElementById("confirmations");
 
-  if(
-    bullConfirmations<3 &&
-    bearConfirmations<3
-  ){
+  confirmations.innerHTML = "";
 
-    reasons.push(
-      "Enough confirmations নেই"
-    );
+  r.reasons.forEach(function (reason) {
 
-  }
+    const span =
+      document.createElement("span");
 
+    span.className = "tag";
+    span.textContent = reason;
+
+    confirmations.appendChild(span);
+  });
+
+  resultBox.scrollIntoView({
+    behavior: "smooth"
+  });
 }
-
-
-
-/* =========================
-RESULT
-========================= */
-
-showResult({
-
-  signal,
-  confidence,
-
-  count:
-  candles.length,
-
-  quality,
-  trend,
-  momentum,
-  structure,
-  pressure,
-
-  bull,
-  bear,
-
-  reasons
-
-});
-
-}
-
-
-
-/* =========================
-SHOW RESULT
-========================= */
-
-function showResult(r){
-
-  const box=
-  document.getElementById(
-    "result"
-  );
-
-  const signal=
-  document.getElementById(
-    "signal"
-  );
-
-
-  box.style.display="block";
-
-
-  signal.textContent=
-  r.signal;
-
-
-  signal.className="";
-
-
-  if(r.signal==="UP"){
-
-    signal.classList.add(
-      "up"
-    );
-
-  }
-  else if(r.signal==="DOWN"){
-
-    signal.classList.add(
-      "down"
-    );
-
-  }
-  else{
-
-    signal.classList.add(
-      "yellow"
-    );
-
-  }
-
-
-  document.getElementById(
-    "strength"
-  ).textContent=
-  "Confidence: "+
-  r.confidence+
-  "/100";
-
-
-  document.getElementById(
-    "count"
-  ).textContent=r.count;
-
-
-  document.getElementById(
-    "quality"
-  ).textContent=r.quality;
-
-
-  document.getElementById(
-    "trend"
-  ).textContent=r.trend;
-
-
-  document.getElementById(
-    "momentum"
-  ).textContent=r.momentum;
-
-
-  document.getElementById(
-    "structure"
-  ).textContent=r.structure;
-
-
-  document.getElementById(
-    "pressure"
-  ).textCo
+  </script>
