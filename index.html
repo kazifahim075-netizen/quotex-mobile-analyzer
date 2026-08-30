@@ -3,105 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Screenshot Analyzer V5.1</title>
+<title>Screenshot Analyzer V6</title>
 
 <style>
 *{box-sizing:border-box}
 body{
-  margin:0;
-  padding:14px;
-  background:#081018;
-  color:#fff;
-  font-family:Arial,sans-serif
+ margin:0;padding:14px;
+ background:#071019;color:white;
+ font-family:Arial,sans-serif
 }
-.wrap{max-width:760px;margin:auto}
+.wrap{max-width:780px;margin:auto}
 .card{
-  background:#111b26;
-  border:1px solid #26384b;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:14px
+ background:#111b26;
+ border:1px solid #26384b;
+ border-radius:16px;
+ padding:14px;
+ margin-bottom:14px
 }
 h1{font-size:23px;margin:4px 0 8px}
 p{font-size:13px;color:#9fb1c5;line-height:1.45}
+
 input[type=file]{width:100%;margin:10px 0}
+
 button{
-  width:100%;
-  padding:15px;
-  border:0;
-  border-radius:12px;
-  background:#6ea7ff;
-  color:#07111e;
-  font-size:17px;
-  font-weight:900;
-  margin-top:10px
+ width:100%;
+ padding:15px;
+ border:0;
+ border-radius:12px;
+ background:#6ea7ff;
+ color:#07111e;
+ font-size:17px;
+ font-weight:900;
+ margin-top:10px
 }
 button:disabled{opacity:.45}
 
 #previewCanvas{
-  width:100%;
-  display:none;
-  border-radius:12px;
-  border:1px solid #2b3c50;
-  margin-top:10px
+ width:100%;
+ display:none;
+ border-radius:12px;
+ border:1px solid #2b3c50;
+ margin-top:10px
 }
 
 .cropBox{
-  margin-top:12px;
-  background:#0d1620;
-  border-radius:12px;
-  padding:12px
+ margin-top:12px;
+ background:#0d1620;
+ border-radius:12px;
+ padding:12px
 }
+
 .sliderRow{margin:10px 0}
 .sliderRow label{
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  color:#a9bad0
+ display:flex;
+ justify-content:space-between;
+ font-size:12px;
+ color:#a9bad0
 }
 .sliderRow input{width:100%}
 
 .result{display:none}
+
 .signal{
-  text-align:center;
-  background:#172330;
-  border-radius:14px;
-  padding:18px
+ text-align:center;
+ background:#172330;
+ border-radius:14px;
+ padding:18px
 }
+
 #direction{
-  font-size:38px;
-  font-weight:900;
-  margin:8px 0
+ font-size:38px;
+ font-weight:900;
+ margin:8px 0
 }
+
 .green{color:#52df8d}
 .red{color:#ff6c6c}
 .yellow{color:#ffd166}
 
 .grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
-  margin-top:12px
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:9px;
+ margin-top:12px
 }
+
 .box{
-  background:#172330;
-  padding:11px;
-  border-radius:11px
+ background:#172330;
+ padding:11px;
+ border-radius:11px
 }
-.label{font-size:12px;color:#91a6bd}
-.value{font-size:16px;font-weight:800;margin-top:4px}
+
+.label{
+ font-size:12px;
+ color:#91a6bd
+}
+
+.value{
+ font-size:16px;
+ font-weight:800;
+ margin-top:4px
+}
+
 .tag{
-  display:inline-block;
-  padding:6px 9px;
-  margin:3px;
-  border-radius:999px;
-  background:#1d2c3c;
-  font-size:12px
+ display:inline-block;
+ padding:6px 9px;
+ margin:3px;
+ border-radius:999px;
+ background:#1d2c3c;
+ font-size:12px
 }
+
 .note{
-  font-size:11px;
-  line-height:1.5;
-  color:#8497ac
+ font-size:11px;
+ line-height:1.5;
+ color:#8497ac
 }
 </style>
 </head>
@@ -111,55 +127,102 @@ button:disabled{opacity:.45}
 <div class="wrap">
 
 <div class="card">
-<h1>📸 Screenshot Analyzer V5.1</h1>
+
+<h1>📸 Screenshot Analyzer V6</h1>
 
 <p>
-Screenshot select করলে সাথে সাথে preview + crop controls আসবে।
+Chart screenshot upload করো। Blue box শুধু candle chart-এর উপর রাখো।
+V6 overall trend-এর পাশাপাশি latest candles-কে বেশি গুরুত্ব দেয়।
 </p>
 
 <input id="file" type="file" accept="image/*">
 
 <canvas id="previewCanvas"></canvas>
 
-<div id="cropControls" class="cropBox" style="display:none">
+<div id="cropControls"
+     class="cropBox"
+     style="display:none">
 
 <div class="sliderRow">
-<label><span>Chart Top</span><span id="topVal">4%</span></label>
-<input id="top" type="range" min="0" max="60" value="4">
+<label>
+<span>Chart Top</span>
+<span id="topVal">3%</span>
+</label>
+<input id="top"
+       type="range"
+       min="0"
+       max="70"
+       value="3">
 </div>
 
 <div class="sliderRow">
-<label><span>Chart Bottom</span><span id="bottomVal">58%</span></label>
-<input id="bottom" type="range" min="25" max="95" value="58">
+<label>
+<span>Chart Bottom</span>
+<span id="bottomVal">72%</span>
+</label>
+<input id="bottom"
+       type="range"
+       min="25"
+       max="100"
+       value="72">
 </div>
 
 <div class="sliderRow">
-<label><span>Chart Left</span><span id="leftVal">4%</span></label>
-<input id="left" type="range" min="0" max="40" value="4">
+<label>
+<span>Chart Left</span>
+<span id="leftVal">2%</span>
+</label>
+<input id="left"
+       type="range"
+       min="0"
+       max="45"
+       value="2">
 </div>
 
 <div class="sliderRow">
-<label><span>Chart Right</span><span id="rightVal">92%</span></label>
-<input id="right" type="range" min="55" max="100" value="92">
+<label>
+<span>Chart Right</span>
+<span id="rightVal">94%</span>
+</label>
+<input id="right"
+       type="range"
+       min="55"
+       max="100"
+       value="94">
 </div>
 
-<p style="margin:4px 0 0">
-Blue box-এর ভিতরে chart candles রাখো।
+<p>
+Slider নড়ালে blue crop box-ও সাথে সাথে নড়বে।
 </p>
 
 </div>
 
-<button id="analyze" disabled>DEEP ANALYZE</button>
+<button id="analyze" disabled>
+DEEP ANALYZE
+</button>
+
 </div>
 
 
-<div id="result" class="card result">
+<div id="result"
+     class="card result">
 
 <div class="signal">
-<div class="label">FINAL CALL</div>
-<div id="direction">---</div>
-<div id="strength">Evidence Strength: --</div>
+
+<div class="label">
+NEXT CANDLE
 </div>
+
+<div id="direction">
+---
+</div>
+
+<div id="strength">
+Evidence Strength: --
+</div>
+
+</div>
+
 
 <div class="grid">
 
@@ -189,6 +252,16 @@ Blue box-এর ভিতরে chart candles রাখো।
 </div>
 
 <div class="box">
+<div class="label">Immediate Bias</div>
+<div id="immediate" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Latest Pattern</div>
+<div id="pattern" class="value">--</div>
+</div>
+
+<div class="box">
 <div class="label">Volatility</div>
 <div id="volatility" class="value">--</div>
 </div>
@@ -210,713 +283,1678 @@ Blue box-এর ভিতরে chart candles রাখো।
 
 </div>
 
+
 <div class="card note">
-Evidence Strength হলো evidence alignment score, guaranteed win probability নয়।
-</div>
+
+Evidence Strength detected evidence কতটা একদিকে align করেছে সেটা দেখায়।
+এটা guaranteed win probability নয়।
 
 </div>
 
-<canvas id="workCanvas" style="display:none"></canvas>
+</div>
+
+
+<canvas id="workCanvas"
+        style="display:none"></canvas>
+
 
 <script>
 
-const file=document.getElementById("file");
-const previewCanvas=document.getElementById("previewCanvas");
-const pctx=previewCanvas.getContext("2d");
+const file =
+document.getElementById("file");
 
-const workCanvas=document.getElementById("workCanvas");
-const wctx=workCanvas.getContext("2d",{willReadFrequently:true});
+const previewCanvas =
+document.getElementById("previewCanvas");
 
-const analyzeBtn=document.getElementById("analyze");
-const controls=document.getElementById("cropControls");
+const pctx =
+previewCanvas.getContext("2d");
 
-const topSlider=document.getElementById("top");
-const bottomSlider=document.getElementById("bottom");
-const leftSlider=document.getElementById("left");
-const rightSlider=document.getElementById("right");
+const workCanvas =
+document.getElementById("workCanvas");
+
+const wctx =
+workCanvas.getContext(
+ "2d",
+ {willReadFrequently:true}
+);
+
+const analyzeBtn =
+document.getElementById("analyze");
+
+const controls =
+document.getElementById("cropControls");
+
+const topSlider =
+document.getElementById("top");
+
+const bottomSlider =
+document.getElementById("bottom");
+
+const leftSlider =
+document.getElementById("left");
+
+const rightSlider =
+document.getElementById("right");
 
 let sourceImage=null;
 
+
 function clamp(v,a,b){
-  return Math.max(a,Math.min(b,v));
+ return Math.max(a,Math.min(b,v));
 }
 
 function avg(a){
-  return a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+ return a.length
+ ?a.reduce((x,y)=>x+y,0)/a.length
+ :0;
 }
 
 function median(a){
-  if(!a.length)return 0;
-  const b=[...a].sort((x,y)=>x-y);
-  const m=Math.floor(b.length/2);
-  return b.length%2?b[m]:(b[m-1]+b[m])/2;
+
+ if(!a.length)return 0;
+
+ const b=[...a].sort(
+  (x,y)=>x-y
+ );
+
+ const m=
+ Math.floor(b.length/2);
+
+ return b.length%2
+ ?b[m]
+ :(b[m-1]+b[m])/2;
 }
 
-/*
-  FIXED MOBILE UPLOAD:
-  FileReader -> DataURL -> Image
-*/
+function std(a){
 
-file.addEventListener("change",function(){
+ if(a.length<2)return 0;
 
-  const f=this.files && this.files[0];
+ const m=avg(a);
 
-  if(!f)return;
+ return Math.sqrt(
+  avg(
+   a.map(
+    x=>(x-m)*(x-m)
+   )
+  )
+ );
+}
 
-  analyzeBtn.disabled=true;
-  analyzeBtn.innerText="LOADING...";
+function unique(a){
+ return [...new Set(a)];
+}
 
-  const reader=new FileReader();
 
-  reader.onload=function(e){
+/* MOBILE UPLOAD */
 
-    const img=new Image();
+file.addEventListener(
+"change",
+function(){
 
-    img.onload=function(){
+ const f=
+ this.files&&this.files[0];
 
-      sourceImage=img;
+ if(!f)return;
 
-      previewCanvas.style.display="block";
-      controls.style.display="block";
+ analyzeBtn.disabled=true;
+ analyzeBtn.innerText="LOADING...";
 
-      updateLabels();
-      drawPreview();
+ const reader=
+ new FileReader();
 
-      analyzeBtn.disabled=false;
-      analyzeBtn.innerText="DEEP ANALYZE";
-    };
+ reader.onload=function(e){
 
-    img.onerror=function(){
+  const img=
+  new Image();
 
-      sourceImage=null;
-      analyzeBtn.disabled=true;
-      analyzeBtn.innerText="DEEP ANALYZE";
+  img.onload=function(){
 
-      alert("Screenshot load হয়নি। অন্য screenshot try করো।");
-    };
+   sourceImage=img;
 
-    img.src=e.target.result;
+   previewCanvas.style.display=
+   "block";
+
+   controls.style.display=
+   "block";
+
+   updateLabels();
+
+   drawPreview();
+
+   analyzeBtn.disabled=false;
+
+   analyzeBtn.innerText=
+   "DEEP ANALYZE";
   };
 
-  reader.onerror=function(){
+  img.onerror=function(){
 
-    analyzeBtn.disabled=true;
-    analyzeBtn.innerText="DEEP ANALYZE";
+   alert(
+   "Screenshot load হয়নি"
+   );
 
-    alert("File read করতে সমস্যা হয়েছে।");
+   analyzeBtn.disabled=true;
   };
 
-  reader.readAsDataURL(f);
+  img.src=e.target.result;
+ };
+
+ reader.readAsDataURL(f);
 });
 
 
 [
-  topSlider,
-  bottomSlider,
-  leftSlider,
-  rightSlider
-].forEach(slider=>{
+ topSlider,
+ bottomSlider,
+ leftSlider,
+ rightSlider
+].forEach(
+slider=>{
 
-  slider.addEventListener("input",function(){
-    fixCropOrder();
-    updateLabels();
-    drawPreview();
-  });
+ slider.addEventListener(
+ "input",
+ function(){
+
+  fixCrop();
+
+  updateLabels();
+
+  drawPreview();
+
+ });
 
 });
 
 
-function fixCropOrder(){
+function fixCrop(){
 
-  if(+bottomSlider.value<=+topSlider.value+10){
-    bottomSlider.value=Math.min(95,+topSlider.value+10);
-  }
+ if(
+  +bottomSlider.value
+  <=
+  +topSlider.value+10
+ ){
 
-  if(+rightSlider.value<=+leftSlider.value+20){
-    rightSlider.value=Math.min(100,+leftSlider.value+20);
-  }
+  bottomSlider.value=
+  Math.min(
+   100,
+   +topSlider.value+10
+  );
+ }
+
+ if(
+  +rightSlider.value
+  <=
+  +leftSlider.value+20
+ ){
+
+  rightSlider.value=
+  Math.min(
+   100,
+   +leftSlider.value+20
+  );
+ }
 }
 
 
 function updateLabels(){
 
-  document.getElementById("topVal").innerText=topSlider.value+"%";
-  document.getElementById("bottomVal").innerText=bottomSlider.value+"%";
-  document.getElementById("leftVal").innerText=leftSlider.value+"%";
-  document.getElementById("rightVal").innerText=rightSlider.value+"%";
+ document.getElementById(
+ "topVal"
+ ).innerText=
+ topSlider.value+"%";
+
+ document.getElementById(
+ "bottomVal"
+ ).innerText=
+ bottomSlider.value+"%";
+
+ document.getElementById(
+ "leftVal"
+ ).innerText=
+ leftSlider.value+"%";
+
+ document.getElementById(
+ "rightVal"
+ ).innerText=
+ rightSlider.value+"%";
 }
 
 
 function drawPreview(){
 
-  if(!sourceImage)return;
+ if(!sourceImage)return;
 
-  const maxW=900;
-  const scale=Math.min(1,maxW/sourceImage.width);
+ const maxW=900;
 
-  previewCanvas.width=Math.round(sourceImage.width*scale);
-  previewCanvas.height=Math.round(sourceImage.height*scale);
+ const scale=
+ Math.min(
+  1,
+  maxW/sourceImage.width
+ );
 
-  pctx.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+ previewCanvas.width=
+ Math.round(
+  sourceImage.width*scale
+ );
 
-  pctx.drawImage(
-    sourceImage,
-    0,0,
-    previewCanvas.width,
-    previewCanvas.height
-  );
+ previewCanvas.height=
+ Math.round(
+  sourceImage.height*scale
+ );
 
-  const W=previewCanvas.width;
-  const H=previewCanvas.height;
+ const W=
+ previewCanvas.width;
 
-  const x=W*(+leftSlider.value/100);
-  const y=H*(+topSlider.value/100);
-  const right=W*(+rightSlider.value/100);
-  const bottom=H*(+bottomSlider.value/100);
+ const H=
+ previewCanvas.height;
 
-  pctx.save();
+ pctx.clearRect(
+ 0,0,W,H
+ );
 
-  pctx.fillStyle="rgba(0,0,0,.48)";
+ pctx.drawImage(
+ sourceImage,
+ 0,0,W,H
+ );
 
-  pctx.fillRect(0,0,W,y);
-  pctx.fillRect(0,bottom,W,H-bottom);
-  pctx.fillRect(0,y,x,bottom-y);
-  pctx.fillRect(right,y,W-right,bottom-y);
+ const x=
+ W*(+leftSlider.value/100);
 
-  pctx.strokeStyle="#55a7ff";
-  pctx.lineWidth=4;
+ const y=
+ H*(+topSlider.value/100);
 
-  pctx.strokeRect(
-    x,
-    y,
-    right-x,
-    bottom-y
-  );
+ const right=
+ W*(+rightSlider.value/100);
 
-  pctx.restore();
+ const bottom=
+ H*(+bottomSlider.value/100);
+
+
+ pctx.save();
+
+ pctx.fillStyle=
+ "rgba(0,0,0,.52)";
+
+ pctx.fillRect(
+ 0,0,W,y
+ );
+
+ pctx.fillRect(
+ 0,bottom,W,H-bottom
+ );
+
+ pctx.fillRect(
+ 0,y,x,bottom-y
+ );
+
+ pctx.fillRect(
+ right,
+ y,
+ W-right,
+ bottom-y
+ );
+
+ pctx.strokeStyle=
+ "#55a7ff";
+
+ pctx.lineWidth=4;
+
+ pctx.strokeRect(
+ x,
+ y,
+ right-x,
+ bottom-y
+ );
+
+ pctx.restore();
 }
 
 
-analyzeBtn.addEventListener("click",function(){
 
-  if(!sourceImage)return;
+analyzeBtn.addEventListener(
+"click",
+function(){
 
-  analyzeBtn.disabled=true;
-  analyzeBtn.innerText="ANALYZING...";
+ if(!sourceImage)return;
 
-  setTimeout(()=>{
+ analyzeBtn.disabled=true;
 
-    try{
-      analyze();
-    }catch(e){
-      console.error(e);
-      alert("Analysis error. Crop area check করে আবার try করো।");
-    }
+ analyzeBtn.innerText=
+ "ANALYZING...";
 
-    analyzeBtn.disabled=false;
-    analyzeBtn.innerText="DEEP ANALYZE";
+ setTimeout(
+ function(){
 
-  },100);
+  try{
+
+   analyze();
+
+  }catch(e){
+
+   console.error(e);
+
+   alert(
+   "Analysis error"
+   );
+  }
+
+  analyzeBtn.disabled=false;
+
+  analyzeBtn.innerText=
+  "DEEP ANALYZE";
+
+ },80);
+
 });
 
 
 function analyze(){
 
-  const L=+leftSlider.value/100;
-  const R=+rightSlider.value/100;
-  const T=+topSlider.value/100;
-  const B=+bottomSlider.value/100;
+ const L=
+ +leftSlider.value/100;
 
-  const sx=Math.round(sourceImage.width*L);
-  const sy=Math.round(sourceImage.height*T);
-  const sw=Math.round(sourceImage.width*(R-L));
-  const sh=Math.round(sourceImage.height*(B-T));
+ const R=
+ +rightSlider.value/100;
 
-  const maxW=1100;
-  const scale=Math.min(1,maxW/sw);
+ const T=
+ +topSlider.value/100;
 
-  workCanvas.width=Math.max(1,Math.round(sw*scale));
-  workCanvas.height=Math.max(1,Math.round(sh*scale));
+ const B=
+ +bottomSlider.value/100;
 
-  wctx.clearRect(0,0,workCanvas.width,workCanvas.height);
 
-  wctx.drawImage(
-    sourceImage,
-    sx,sy,sw,sh,
-    0,0,
-    workCanvas.width,
-    workCanvas.height
-  );
+ const sx=
+ Math.round(
+  sourceImage.width*L
+ );
 
-  const W=workCanvas.width;
-  const H=workCanvas.height;
+ const sy=
+ Math.round(
+  sourceImage.height*T
+ );
 
-  const pixels=wctx.getImageData(0,0,W,H).data;
+ const sw=
+ Math.round(
+  sourceImage.width*(R-L)
+ );
 
-  function colorType(r,g,b){
+ const sh=
+ Math.round(
+  sourceImage.height*(B-T)
+ );
 
-    const max=Math.max(r,g,b);
-    const min=Math.min(r,g,b);
 
-    if(max<50)return 0;
-    if(max-min<12)return 0;
+ const scale=
+ Math.min(
+ 1,
+ 1200/sw
+ );
 
-    if(g>r+10 && g>b-30)return 1;
-    if(r>g+10 && r>b-20)return -1;
 
-    return 0;
-  }
+ workCanvas.width=
+ Math.max(
+ 1,
+ Math.round(sw*scale)
+ );
 
-  const columns=[];
+ workCanvas.height=
+ Math.max(
+ 1,
+ Math.round(sh*scale)
+ );
 
-  for(let x=0;x<W;x++){
 
-    let bull=0;
-    let bear=0;
-    let top=Infinity;
-    let bottom=-Infinity;
+ wctx.clearRect(
+ 0,
+ 0,
+ workCanvas.width,
+ workCanvas.height
+ );
 
-    for(let y=0;y<H;y++){
 
-      const i=(y*W+x)*4;
+ wctx.drawImage(
+ sourceImage,
+ sx,sy,sw,sh,
+ 0,0,
+ workCanvas.width,
+ workCanvas.height
+ );
 
-      const c=colorType(
-        pixels[i],
-        pixels[i+1],
-        pixels[i+2]
-      );
 
-      if(c){
+ const W=
+ workCanvas.width;
 
-        if(c===1)bull++;
-        else bear++;
+ const H=
+ workCanvas.height;
 
-        top=Math.min(top,y);
-        bottom=Math.max(bottom,y);
-      }
-    }
 
-    columns.push({
-      x,
-      bull,
-      bear,
-      count:bull+bear,
-      top,
-      bottom
-    });
-  }
+ const pixels=
+ wctx.getImageData(
+ 0,0,W,H
+ ).data;
 
-  const activeCounts=
-    columns.filter(c=>c.count>0).map(c=>c.count);
 
-  const medCount=median(activeCounts);
+ /*
+ GREEN / RED CANDLE PIXELS
+ */
 
-  const minActivity=Math.max(2,medCount*0.15);
+ function type(r,g,b){
 
-  let runs=[];
-  let cur=null;
+  const mx=
+  Math.max(r,g,b);
 
-  for(const c of columns){
+  const mn=
+  Math.min(r,g,b);
 
-    const height=
-      isFinite(c.top)
-      ?c.bottom-c.top+1
-      :0;
+  if(mx<48)return 0;
 
-    const active=
-      c.count>=minActivity &&
-      height>=3 &&
-      height<=H*.75;
+  if(mx-mn<11)return 0;
 
-    if(active){
 
-      if(!cur){
+  if(
+   g>r+9 &&
+   g>b-35
+  )return 1;
 
-        cur={
-          start:c.x,
-          end:c.x,
-          bull:c.bull,
-          bear:c.bear,
-          top:c.top,
-          bottom:c.bottom
-        };
 
-      }else if(c.x-cur.end<=2){
+  if(
+   r>g+9 &&
+   r>b-25
+  )return -1;
 
-        cur.end=c.x;
-        cur.bull+=c.bull;
-        cur.bear+=c.bear;
-        cur.top=Math.min(cur.top,c.top);
-        cur.bottom=Math.max(cur.bottom,c.bottom);
 
-      }else{
+  return 0;
+ }
 
-        runs.push(cur);
 
-        cur={
-          start:c.x,
-          end:c.x,
-          bull:c.bull,
-          bear:c.bear,
-          top:c.top,
-          bottom:c.bottom
-        };
-      }
+ const cols=[];
 
-    }else if(cur){
 
-      runs.push(cur);
-      cur=null;
-    }
-  }
-
-  if(cur)runs.push(cur);
-
-  let candles=[];
-
-  for(const r of runs){
-
-    const width=r.end-r.start+1;
-    const range=r.bottom-r.top+1;
-
-    if(
-      width<1 ||
-      width>30 ||
-      range<3 ||
-      range>H*.75 ||
-      r.bull+r.bear<4
-    )continue;
-
-    candles.push({
-      x:(r.start+r.end)/2,
-      dir:r.bull>=r.bear?1:-1,
-      high:r.top,
-      low:r.bottom,
-      range,
-      power:
-        Math.abs(r.bull-r.bear)/
-        Math.max(1,r.bull+r.bear)
-    });
-  }
-
-  candles.sort((a,b)=>a.x-b.x);
-
-  if(candles.length>40){
-    candles=candles.slice(-40);
-  }
-
-  let qualityScore=
-    Math.round(
-      clamp(
-        candles.length/15*80,
-        0,
-        100
-      )
-    );
-
-  const quality=
-    qualityScore>=75
-    ?"GOOD"
-    :qualityScore>=55
-    ?"USABLE"
-    :qualityScore>=35
-    ?"WEAK"
-    :"POOR";
-
-  if(candles.length<5){
-
-    show({
-      direction:"CROP",
-      strength:0,
-      candles:candles.length,
-      quality,
-      trend:"UNKNOWN",
-      momentum:"UNKNOWN",
-      structure:"UNKNOWN",
-      volatility:"UNKNOWN",
-      bull:0,
-      bear:0,
-      reasons:[
-        "Enough candles detect হয়নি",
-        "Blue box শুধু candle chart area-তে রাখো"
-      ]
-    });
-
-    return;
-  }
+ for(let x=0;x<W;x++){
 
   let bull=0;
   let bear=0;
-  const reasons=[];
 
-  const recent=candles.slice(-10);
+  let ysBull=[];
+  let ysBear=[];
 
-  const meanRange=
+
+  for(let y=0;y<H;y++){
+
+   const i=
+   (y*W+x)*4;
+
+   const c=
+   type(
+    pixels[i],
+    pixels[i+1],
+    pixels[i+2]
+   );
+
+
+   if(c===1){
+
+    bull++;
+
+    ysBull.push(y);
+
+   }else if(c===-1){
+
+    bear++;
+
+    ysBear.push(y);
+   }
+  }
+
+
+  cols.push({
+
+   x,
+
+   bull,
+
+   bear,
+
+   count:
+   bull+bear,
+
+   ysBull,
+
+   ysBear
+
+  });
+
+ }
+
+
+ const nz=
+ cols
+ .filter(c=>c.count>0)
+ .map(c=>c.count);
+
+
+ const medCount=
+ median(nz);
+
+
+ const minActivity=
+ Math.max(
+ 2,
+ medCount*.14
+ );
+
+
+ /*
+ MERGE CANDLE COLUMNS
+ */
+
+
+ let runs=[];
+
+ let current=null;
+
+
+ for(const c of cols){
+
+  const ys=
+  c.ysBull.concat(
+   c.ysBear
+  );
+
+
+  const top=
+  ys.length
+  ?Math.min(...ys)
+  :Infinity;
+
+
+  const bottom=
+  ys.length
+  ?Math.max(...ys)
+  :-Infinity;
+
+
+  const height=
+  isFinite(top)
+  ?bottom-top+1
+  :0;
+
+
+  const active=
+  c.count>=minActivity
+  &&
+  height>=3
+  &&
+  height<=H*.70;
+
+
+  if(active){
+
+   if(!current){
+
+    current={
+
+     start:c.x,
+
+     end:c.x,
+
+     bull:c.bull,
+
+     bear:c.bear,
+
+     top,
+
+     bottom
+
+    };
+
+   }else if(
+    c.x-current.end<=2
+   ){
+
+    current.end=c.x;
+
+    current.bull+=c.bull;
+
+    current.bear+=c.bear;
+
+    current.top=
+    Math.min(
+     current.top,
+     top
+    );
+
+    current.bottom=
     Math.max(
-      4,
-      avg(recent.map(c=>c.range))
+     current.bottom,
+     bottom
     );
 
-  const green=
-    recent.filter(c=>c.dir===1).length;
+   }else{
 
-  const red=
-    recent.filter(c=>c.dir===-1).length;
+    runs.push(
+     current
+    );
 
-  if(green>red){
+    current={
 
-    bull+=14+(green-red)*2;
-    reasons.push("Bullish candle pressure");
+     start:c.x,
 
-  }else if(red>green){
+     end:c.x,
 
-    bear+=14+(red-green)*2;
-    reasons.push("Bearish candle pressure");
+     bull:c.bull,
+
+     bear:c.bear,
+
+     top,
+
+     bottom
+
+    };
+   }
+
+  }else if(current){
+
+   runs.push(
+    current
+   );
+
+   current=null;
   }
+ }
 
-  let trend="SIDEWAYS";
 
-  const trendSet=
-    candles.slice(-Math.min(14,candles.length));
+ if(current)
+ runs.push(current);
 
-  const group=
-    Math.max(
-      2,
-      Math.floor(trendSet.length/3)
-    );
 
-  const oldMid=
-    avg(
-      trendSet.slice(0,group)
-      .map(c=>(c.high+c.low)/2)
-    );
 
-  const newMid=
-    avg(
-      trendSet.slice(-group)
-      .map(c=>(c.high+c.low)/2)
-    );
+ /*
+ FILTER UI BLOCKS
+ */
 
-  const move=
-    (oldMid-newMid)/meanRange;
 
-  if(move>.35){
+ runs=
+ runs.filter(r=>{
 
-    trend="BULLISH";
-    bull+=22;
-    reasons.push("Bullish trend");
+  const width=
+  r.end-r.start+1;
 
-  }else if(move<-.35){
+  const height=
+  r.bottom-r.top+1;
 
-    trend="BEARISH";
-    bear+=22;
-    reasons.push("Bearish trend");
-  }
+  return(
+   width>=1
+   &&
+   width<=Math.max(
+    30,
+    W*.035
+   )
+   &&
+   height>=3
+   &&
+   height<=H*.68
+   &&
+   r.bull+r.bear>=4
+  );
 
-  let structure="MIXED";
+ });
 
-  if(candles.length>=8){
 
-    const old=candles.slice(-8,-4);
-    const now=candles.slice(-4);
 
-    const oldHigh=avg(old.map(c=>c.high));
-    const oldLow=avg(old.map(c=>c.low));
+ /*
+ BODY + WICK GEOMETRY
+ */
 
-    const newHigh=avg(now.map(c=>c.high));
-    const newLow=avg(now.map(c=>c.low));
 
-    const tol=meanRange*.08;
+ let candles=[];
 
-    if(
-      newHigh<oldHigh-tol &&
-      newLow<oldLow-tol
-    ){
 
-      structure="HH / HL";
-      bull+=20;
-      reasons.push("HH/HL bullish structure");
+ for(const r of runs){
 
-    }else if(
-      newHigh>oldHigh+tol &&
-      newLow>oldLow+tol
-    ){
+  const direction=
+  r.bull>=r.bear
+  ?1:-1;
 
-      structure="LH / LL";
-      bear+=20;
-      reasons.push("LH/LL bearish structure");
 
-    }else{
+  const width=
+  r.end-r.start+1;
 
-      structure="TRANSITION / MIXED";
-    }
-  }
 
-  let momentum="MIXED";
+  const rowCount={};
 
-  const bp=
-    recent
-    .filter(c=>c.dir===1)
-    .reduce(
-      (s,c)=>s+c.power*c.range,
-      0
-    );
 
-  const rp=
-    recent
-    .filter(c=>c.dir===-1)
-    .reduce(
-      (s,c)=>s+c.power*c.range,
-      0
-    );
-
-  if(bp>rp*1.15){
-
-    momentum="BULLISH";
-    bull+=18;
-    reasons.push("Bullish momentum");
-
-  }else if(rp>bp*1.15){
-
-    momentum="BEARISH";
-    bear+=18;
-    reasons.push("Bearish momentum");
-  }
-
-  let volatility="NORMAL";
-
-  if(
-    Math.abs(green-red)<=1 &&
-    trend==="SIDEWAYS"
+  for(
+   let x=r.start;
+   x<=r.end;
+   x++
   ){
 
-    volatility="CHOPPY";
-    bull*=.90;
-    bear*=.90;
-    reasons.push("Choppy market penalty");
+   const c=
+   cols[x];
+
+   if(!c)continue;
+
+
+   const ys=
+   direction===1
+   ?c.ysBull
+   :c.ysBear;
+
+
+   ys.forEach(
+   y=>{
+
+    rowCount[y]=
+    (rowCount[y]||0)+1;
+
+   });
+
   }
 
-  if(
-    trend==="BULLISH" &&
-    momentum==="BULLISH" &&
-    structure==="HH / HL"
+
+  const denseRows=
+  Object.entries(
+   rowCount
+  )
+  .filter(
+   ([y,n])=>
+   n>=Math.max(
+    1,
+    Math.ceil(width*.35)
+   )
+  )
+  .map(
+   ([y])=>+y
+  );
+
+
+  const high=
+  r.top;
+
+  const low=
+  r.bottom;
+
+
+  const bodyTop=
+  denseRows.length
+  ?Math.min(...denseRows)
+  :high;
+
+
+  const bodyBottom=
+  denseRows.length
+  ?Math.max(...denseRows)
+  :low;
+
+
+  const body=
+  Math.max(
+   1,
+   bodyBottom-bodyTop
+  );
+
+
+  const range=
+  Math.max(
+   1,
+   low-high
+  );
+
+
+  const open=
+  direction===1
+  ?bodyBottom
+  :bodyTop;
+
+
+  const close=
+  direction===1
+  ?bodyTop
+  :bodyBottom;
+
+
+  const upperWick=
+  Math.max(
+   0,
+   Math.min(open,close)-high
+  );
+
+
+  const lowerWick=
+  Math.max(
+   0,
+   low-Math.max(open,close)
+  );
+
+
+  candles.push({
+
+   x:
+   (r.start+r.end)/2,
+
+   dir:
+   direction,
+
+   high,
+
+   low,
+
+   open,
+
+   close,
+
+   body,
+
+   range,
+
+   upperWick,
+
+   lowerWick,
+
+   bodyRatio:
+   body/range,
+
+   power:
+   Math.abs(
+    r.bull-r.bear
+   )/
+   Math.max(
+    1,
+    r.bull+r.bear
+   )
+
+  });
+
+ }
+
+
+ candles.sort(
+ (a,b)=>a.x-b.x
+ );
+
+
+ /*
+ KEEP CONTINUOUS CANDLE CLUSTER
+ */
+
+
+ if(candles.length>=4){
+
+  const gaps=[];
+
+
+  for(
+   let i=1;
+   i<candles.length;
+   i++
   ){
 
-    bull+=18;
-    reasons.push("Strong bullish confluence");
+   gaps.push(
+    candles[i].x-
+    candles[i-1].x
+   );
   }
 
-  if(
-    trend==="BEARISH" &&
-    momentum==="BEARISH" &&
-    structure==="LH / LL"
+
+  const normalGap=
+  Math.max(
+   3,
+   median(gaps)
+  );
+
+
+  let clusters=[];
+
+  let cluster=[
+   candles[0]
+  ];
+
+
+  for(
+   let i=1;
+   i<candles.length;
+   i++
   ){
 
-    bear+=18;
-    reasons.push("Strong bearish confluence");
-  }
+   const gap=
+   candles[i].x-
+   candles[i-1].x;
 
-  const last=
-    candles[candles.length-1];
 
-  let direction=
-    bull>bear
-    ?"UP"
-    :bear>bull
-    ?"DOWN"
-    :last.dir===1
-    ?"UP"
-    :"DOWN";
+   if(
+    gap<=normalGap*2.7
+   ){
 
-  const hi=Math.max(bull,bear);
-  const lo=Math.min(bull,bear);
-
-  const separation=
-    (hi-lo)/Math.max(1,hi+lo);
-
-  let strength=
-    Math.round(
-      clamp(
-        48+
-        separation*38+
-        Math.min(10,reasons.length)+
-        (qualityScore-50)*.10,
-        45,
-        100
-      )
+    cluster.push(
+     candles[i]
     );
+
+   }else{
+
+    clusters.push(
+     cluster
+    );
+
+    cluster=[
+     candles[i]
+    ];
+   }
+  }
+
+
+  clusters.push(
+   cluster
+  );
+
+
+  clusters.sort(
+   (a,b)=>
+   b.length-a.length
+  );
+
+
+  candles=
+  clusters[0]||[];
+ }
+
+
+ if(candles.length>45)
+ candles=
+ candles.slice(-45);
+
+
+
+ /*
+ QUALITY
+ */
+
+
+ let qualityScore=
+ Math.round(
+  clamp(
+   candles.length/18*78,
+   0,
+   78
+  )
+ );
+
+
+ if(candles.length>=10)
+ qualityScore+=12;
+
+
+ if(candles.length>=18)
+ qualityScore+=10;
+
+
+ qualityScore=
+ clamp(
+ qualityScore,
+ 0,
+ 100
+ );
+
+
+ const quality=
+ qualityScore>=75
+ ?"GOOD"
+ :qualityScore>=55
+ ?"USABLE"
+ :qualityScore>=35
+ ?"WEAK"
+ :"POOR";
+
+
+ if(candles.length<6){
 
   show({
-    direction,
-    strength,
-    candles:candles.length,
-    quality,
-    trend,
-    momentum,
-    structure,
-    volatility,
-    bull:Math.round(bull),
-    bear:Math.round(bear),
-    reasons
+
+   direction:"CROP",
+
+   strength:0,
+
+   candles:
+   candles.length,
+
+   quality,
+
+   trend:"UNKNOWN",
+
+   momentum:"UNKNOWN",
+
+   structure:"UNKNOWN",
+
+   immediate:"UNKNOWN",
+
+   pattern:"UNKNOWN",
+
+   volatility:"UNKNOWN",
+
+   bull:0,
+
+   bear:0,
+
+   reasons:[
+    "Enough reliable candles detect হয়নি",
+    "Crop box candle chart-এর উপর রাখো"
+   ]
+
   });
-}
+
+  return;
+ }
 
 
-function show(o){
 
-  document.getElementById("result").style.display="block";
+ /*
+ ANALYSIS ENGINE
+ */
 
-  const d=document.getElementById("direction");
 
-  if(o.direction==="UP"){
+ const recent=
+ candles.slice(-10);
 
-    d.innerText="UP ⬆️";
-    d.className="green";
 
-  }else if(o.direction==="DOWN"){
+ const recent5=
+ candles.slice(-5);
 
-    d.innerText="DOWN ⬇️";
-    d.className="red";
+
+ const recent3=
+ candles.slice(-3);
+
+
+ const last=
+ candles[
+ candles.length-1
+ ];
+
+
+ const previous=
+ candles[
+ candles.length-2
+ ];
+
+
+ const meanRange=
+ Math.max(
+ 4,
+ avg(
+  recent.map(
+   c=>c.range
+  )
+ )
+ );
+
+
+ let bull=0;
+
+ let bear=0;
+
+ let reasons=[];
+
+
+
+ /*
+ OVERALL TREND
+ */
+
+
+ let trend=
+ "SIDEWAYS";
+
+
+ const trendSet=
+ candles.slice(
+  -Math.min(
+   16,
+   candles.length
+  )
+ );
+
+
+ const group=
+ Math.max(
+ 2,
+ Math.floor(
+  trendSet.length/3
+ )
+ );
+
+
+ const oldMid=
+ avg(
+  trendSet
+  .slice(0,group)
+  .map(
+   c=>
+   (c.high+c.low)/2
+  )
+ );
+
+
+ const newMid=
+ avg(
+  trendSet
+  .slice(-group)
+  .map(
+   c=>
+   (c.high+c.low)/2
+  )
+ );
+
+
+ const move=
+ (oldMid-newMid)/
+ meanRange;
+
+
+ if(move>.35){
+
+  trend="BULLISH";
+
+  bull+=16;
+
+  reasons.push(
+   "Overall bullish trend"
+  );
+
+ }else if(move<-.35){
+
+  trend="BEARISH";
+
+  bear+=16;
+
+  reasons.push(
+   "Overall bearish trend"
+  );
+ }
+
+
+
+ /*
+ HH HL LH LL / CHOCH
+ */
+
+
+ let structure=
+ "MIXED";
+
+
+ if(candles.length>=8){
+
+  const old=
+  candles.slice(-8,-4);
+
+  const now=
+  candles.slice(-4);
+
+
+  const oldHigh=
+  avg(
+   old.map(
+    c=>c.high
+   )
+  );
+
+
+  const oldLow=
+  avg(
+   old.map(
+    c=>c.low
+   )
+  );
+
+
+  const newHigh=
+  avg(
+   now.map(
+    c=>c.high
+   )
+  );
+
+
+  const newLow=
+  avg(
+   now.map(
+    c=>c.low
+   )
+  );
+
+
+  const tolerance=
+  meanRange*.08;
+
+
+  if(
+   newHigh<
+   oldHigh-tolerance
+   &&
+   newLow<
+   oldLow-tolerance
+  ){
+
+   structure=
+   "HH / HL";
+
+   bull+=16;
+
+   reasons.push(
+    "HH/HL bullish structure"
+   );
+
+  }else if(
+   newHigh>
+   oldHigh+tolerance
+   &&
+   newLow>
+   oldLow+tolerance
+  ){
+
+   structure=
+   "LH / LL";
+
+   bear+=16;
+
+   reasons.push(
+    "LH/LL bearish structure"
+   );
 
   }else{
 
-    d.innerText="ADJUST CHART CROP";
-    d.className="yellow";
+   structure=
+   "CHoCH / TRANSITION";
+
+   reasons.push(
+    "Structure transition"
+   );
   }
+ }
 
-  document.getElementById("strength").innerText=
-    "Evidence Strength: "+o.strength+"/100";
 
-  document.getElementById("candleCount").innerText=o.candles;
-  document.getElementById("quality").innerText=o.quality;
-  document.getElementById("trend").innerText=o.trend;
-  document.getElementById("momentum").innerText=o.momentum;
-  document.getElementById("structure").innerText=o.structure;
-  document.getElementById("volatility").innerText=o.volatility;
-  document.getElementById("bull").innerText=o.bull;
-  document.getElementById("bear").innerText=o.bear;
 
-  const box=document.getElementById("confirmations");
-  box.innerHTML="";
+ /*
+ RECENT MOMENTUM
+ */
 
-  [...new Set(o.reasons)].forEach(t=>{
 
-    const tag=document.createElement("span");
+ function pressure(arr){
 
-    tag.className="tag";
-    tag.innerText=t;
+  let b=0;
+  let r=0;
 
-    box.appendChild(tag);
+
+  arr.forEach(
+  (c,i)=>{
+
+   const weight=
+   1+i*.35;
+
+
+   const power=
+   c.body*
+   c.power*
+   weight;
+
+
+   if(c.dir===1)
+   b+=power;
+
+   else
+   r+=power;
+
   });
 
-  document
-    .getElementById("result")
-    .scrollIntoView({behavior:"smooth"});
-}
 
-updateLabels();
+  return[b,r];
+ }
 
-</script>
 
-</body>
-  </html>
+ const powers=
+ pressure(
+  recent5
+ );
+
+
+ const bullPower=
+ powers[0];
+
+
+ const bearPower=
+ powers[1];
+
+
+ let momentum=
+ "MIXED";
+
+
+ if(
+  bullPower>
+  bearPower*1.12
+ ){
+
+  momentum=
+  "BULLISH";
+
+  bull+=18;
+
+  reasons.push(
+   "Recent bullish momentum"
+  );
+
+ }else if(
+  bearPower>
+  bullPower*1.12
+ ){
+
+  momentum=
+  "BEARISH";
+
+  bear+=18;
+
+  reasons.push(
+   "Recent bearish momentum"
+  );
+ }
+
+
+
+ /*
+ CANDLE PATTERN ENGINE
+ */
+
+
+ let patterns=[];
+
+
+ if(
+  last.bodyRatio<.14
+ ){
+
+  patterns.push(
+   "Doji"
+  );
+
+  bull+=2;
+  bear+=2;
+ }
+
+
+ if(
+  last.bodyRatio>.78
+ ){
+
+  if(last.dir===1){
+
+   patterns.push(
+    "Bullish Marubozu"
+   );
+
+   bull+=10;
+
+  }else{
+
+   patterns.push(
+    "Bearish Marubozu"
+   );
+
+   bear+=10;
+  }
+ }
+
+
+ if(
+  last.lowerWick>
+  last.body*2
+  &&
+  last.upperWick<
+  last.body
+ ){
+
+  patterns.push(
+   "Hammer / Bullish Pin"
+  );
+
+  bull+=15;
+
+  reasons.push(
+   "Strong lower-wick rejection"
+  );
+ }
+
+
+ if(
+  last.upperWick>
+  last.body*2
+  &&
+  last.lowerWick<
+  last.body
+ ){
+
+  patterns.push(
+   "Shooting Star / Bearish Pin"
+  );
+
+  bear+=15;
+
+  reasons.push(
+   "Strong upper-wick rejection"
+  );
+ }
+
+
+
+ /*
+ ENGULFING / HARAMI
+ */
+
+
+ const prevTop=
+ Math.min(
+  previous.open,
+  previous.close
+ );
+
+
+ const prevBottom=
+ Math.max(
+  previous.open,
+  previous.close
+ );
+
+
+ const lastTop=
+ Math.min(
+  last.open,
+  last.close
+ );
+
+
+ const lastBottom=
+ Math.max(
+  last.open,
+  last.close
+ );
+
+
+ if(
+  last.dir===1
+  &&
+  previous.dir===-1
+  &&
+  lastTop<=prevTop
+  &&
+  lastBottom>=prevBottom
+ ){
+
+  patterns.push(
+   "Bullish Engulfing"
+  );
+
+  bull+=16;
+
+  reasons.push(
+   "Bullish engulfing"
+  );
+ }
+
+
+ if(
+  last.dir===-1
+  &&
+  previous.dir===1
+  &&
+  lastTop<=prevTop
+  &&
+  lastBottom>=prevBottom
+ ){
+
+  patterns.push(
+   "Bearish Engulfing"
+  );
+
+  bear+=16;
+
+  reasons.push(
+   "Bearish engulfing"
+  );
+ }
+
+
+ if(
+  lastTop>=prevTop
+  &&
+  lastBottom<=prevBottom
+ ){
+
+  patterns.push(
+   "Harami / Inside Body"
+  );
+
+  bull+=3;
+  bear+=3;
+ }
+
+
+
+ /*
+ MORNING / EVENING STAR STYLE
+ */
+
+
+ if(candles.length>=3){
+
+  const a=
+  candles[
+   candles.length-3
+  ];
+
+  const b=
+  candles[
+   candles.length-2
+  ];
+
+
+  if(
+   a.dir===-1
+   &&
+   b.bodyRatio<.35
+   &&
+   last.dir===1
+   &&
+   last.body>
+   a.body*.55
+  ){
+
+   patterns.push(
+    "Morning Star style"
+   );
+
+   bull+=14;
+
+   reasons.push(
+    "3-candle bullish reversal"
+   );
+  }
+
+
+  if(
+   a.dir===1
+   &&
+   b.bodyRatio<.35
+   &&
+   last.dir===-1
+   &&
+   last.body>
+   a.body*.55
+  ){
+
+   patterns.push(
+    "Evening Star style"
+   );
+
+   bear+=14;
+
+   reasons.push(
+    "3-candle bearish reversal"
+   );
+  }
+ }
+
+
+ const pattern=
+ patterns.length
+ ?patterns.join(", ")
+ :"No strong pattern";
+
+
+
+ /*
+ MOST IMPORTANT:
+ LAST 3 CANDLE BIAS
+ */
+
+
+ let immediateScore=0;
+
+
+ recent3.forEach(
+ (c,i)=>{
+
+  const weight=
+  1+i*.65;
+
+
+  immediateScore+=
+  (
+   c.dir===1
+   ?1:-1
+  )
+  *
+  c.bodyRatio
+  *
+  weight;
+
+
+  if(
+   c.lowerWick>
+   c.body*1.7
+  ){
+
+   immediateScore+=
+   .55*weight;
+  }
+
+
+  if(
+   c.upperWick>
+   c.body*1.7
+  ){
+
+   immediateScore-=
+   .55*weight;
+  }
+
+ });
+
+  
