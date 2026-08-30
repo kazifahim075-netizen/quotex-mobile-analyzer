@@ -1,192 +1,651 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Screenshot Analyzer V7</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:16px;
+  background:#07111a;
+  color:white;
+  font-family:Arial,sans-serif;
+}
+
+.container{
+  max-width:760px;
+  margin:auto;
+}
+
+.card{
+  background:#111c27;
+  border:1px solid #293b4d;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:18px;
+}
+
+h1{
+  margin:0 0 12px;
+  font-size:25px;
+}
+
+.description{
+  color:#a9b8c9;
+  line-height:1.6;
+  font-size:14px;
+}
+
+input[type=file]{
+  width:100%;
+  margin:18px 0;
+  font-size:16px;
+}
+
+#preview{
+  display:none;
+  width:100%;
+  height:auto;
+  border-radius:14px;
+  border:2px solid #33485e;
+  margin:10px 0 15px;
+}
+
+#status{
+  display:none;
+  padding:10px;
+  margin:10px 0;
+  border-radius:10px;
+  background:#172636;
+  color:#9fc3e8;
+  font-size:13px;
+}
+
+button{
+  width:100%;
+  padding:17px;
+  border:none;
+  border-radius:14px;
+  background:#69a4fa;
+  color:#08111c;
+  font-size:19px;
+  font-weight:bold;
+}
+
+button:disabled{
+  opacity:.45;
+}
+
+#result{
+  display:none;
+}
+
+.signalBox{
+  text-align:center;
+  background:#172432;
+  padding:22px;
+  border-radius:16px;
+}
+
+.small{
+  color:#9fb0c2;
+  font-size:13px;
+}
+
+#signal{
+  font-size:44px;
+  font-weight:900;
+  margin:10px 0;
+}
+
+.up{
+  color:#4ce08a;
+}
+
+.down{
+  color:#ff6464;
+}
+
+.yellow{
+  color:#ffd166;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+
+.box{
+  background:#172432;
+  border-radius:13px;
+  padding:13px;
+}
+
+.label{
+  color:#95a9be;
+  font-size:12px;
+}
+
+.value{
+  font-size:17px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.tag{
+  display:inline-block;
+  background:#1d3042;
+  border-radius:30px;
+  padding:7px 10px;
+  margin:4px;
+  font-size:12px;
+}
+
+.warning{
+  color:#8799ac;
+  font-size:12px;
+  line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h1>📸 Screenshot Analyzer V7</h1>
+
+<div class="description">
+Screenshot select করো, তারপর DEEP ANALYZE চাপো।
+</div>
+
+<input
+  id="fileInput"
+  type="file"
+  accept="image/*"
+>
+
+<div id="status">
+Waiting...
+</div>
+
+<img
+  id="preview"
+  alt="Selected screenshot"
+>
+
+<button
+  id="analyzeBtn"
+  disabled
+>
+DEEP ANALYZE
+</button>
+
+</div>
+
+
+<div id="result" class="card">
+
+<div class="signalBox">
+
+<div class="small">
+NEXT CANDLE BIAS
+</div>
+
+<div id="signal">
+--
+</div>
+
+<div id="strength">
+Confidence: --/100
+</div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="box">
+<div class="label">Detected Pixels</div>
+<div id="count" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Quality</div>
+<div id="quality" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Trend</div>
+<div id="trend" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Momentum</div>
+<div id="momentum" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Structure</div>
+<div id="structure" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Pressure</div>
+<div id="pressure" class="value">--</div>
+</div>
+
+<div class="box">
+<div class="label">Bull Score</div>
+<div id="bull" class="value up">--</div>
+</div>
+
+<div class="box">
+<div class="label">Bear Score</div>
+<div id="bear" class="value down">--</div>
+</div>
+
+</div>
+
+<h3>Confirmations</h3>
+<div id="confirmations"></div>
+
+</div>
+
+
+<div class="card warning">
+V7 screenshot analyzer। এটা guaranteed trading prediction না।
+</div>
+
+</div>
+
+
+<canvas
+  id="canvas"
+  style="display:none"
+></canvas>
+
+
 <script>
 const fileInput = document.getElementById("fileInput");
 const preview = document.getElementById("preview");
 const analyzeBtn = document.getElementById("analyzeBtn");
 const statusBox = document.getElementById("status");
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d", { willReadFrequently:true });
+
+const ctx = canvas.getContext(
+  "2d",
+  { willReadFrequently:true }
+);
 
 let imageReady = false;
 
+
+/* =========================
+   SCREENSHOT LOAD
+========================= */
+
 fileInput.addEventListener("change", function () {
+
   imageReady = false;
   analyzeBtn.disabled = true;
-
-  const file = this.files && this.files[0];
+  preview.style.display = "none";
 
   statusBox.style.display = "block";
 
+  const file =
+    this.files &&
+    this.files[0];
+
   if (!file) {
-    statusBox.textContent = "❌ No screenshot selected";
+    statusBox.textContent =
+      "❌ No screenshot selected";
     return;
   }
 
-  statusBox.textContent = "⏳ Screenshot loading...";
+  statusBox.textContent =
+    "⏳ Screenshot loading...";
 
-  const reader = new FileReader();
+  const reader =
+    new FileReader();
+
 
   reader.onload = function (e) {
-    const img = new Image();
+
+    const img =
+      new Image();
+
 
     img.onload = function () {
-      preview.src = e.target.result;
-      preview.style.display = "block";
 
-      imageReady = true;
-      analyzeBtn.disabled = false;
+      preview.src =
+        e.target.result;
+
+      preview.style.display =
+        "block";
+
+      imageReady =
+        true;
+
+      analyzeBtn.disabled =
+        false;
 
       statusBox.textContent =
         "✅ Screenshot loaded — DEEP ANALYZE চাপো";
     };
 
+
     img.onerror = function () {
-      imageReady = false;
-      analyzeBtn.disabled = true;
+
+      imageReady =
+        false;
+
+      analyzeBtn.disabled =
+        true;
+
       statusBox.textContent =
         "❌ Screenshot load হয়নি";
     };
 
-    img.src = e.target.result;
+
+    img.src =
+      e.target.result;
   };
 
+
   reader.onerror = function () {
+
     statusBox.textContent =
       "❌ File read error";
   };
+
 
   reader.readAsDataURL(file);
 });
 
 
+/* =========================
+   ANALYZE BUTTON
+========================= */
+
 analyzeBtn.addEventListener("click", function () {
 
   if (!imageReady) {
-    alert("আগে screenshot select করো");
+
+    alert(
+      "আগে screenshot select করো"
+    );
+
     return;
   }
 
-  analyzeBtn.disabled = true;
-  analyzeBtn.textContent = "ANALYZING...";
 
-  statusBox.style.display = "block";
-  statusBox.textContent = "🔍 Deep analysis চলছে...";
+  analyzeBtn.disabled =
+    true;
+
+  analyzeBtn.textContent =
+    "ANALYZING...";
+
+
+  statusBox.style.display =
+    "block";
+
+  statusBox.textContent =
+    "🔍 Deep analysis চলছে...";
+
 
   setTimeout(function () {
 
     try {
+
       runSimpleAnalysis();
+
     } catch (err) {
+
       console.error(err);
+
       statusBox.textContent =
-        "❌ Analysis error: " + err.message;
+        "❌ Analysis error: " +
+        err.message;
     }
 
-    analyzeBtn.disabled = false;
-    analyzeBtn.textContent = "DEEP ANALYZE";
+
+    analyzeBtn.disabled =
+      false;
+
+    analyzeBtn.textContent =
+      "DEEP ANALYZE";
 
   }, 150);
+
 });
 
 
+/* =========================
+   SIMPLE ANALYSIS
+========================= */
+
 function runSimpleAnalysis() {
 
-  const W = preview.naturalWidth;
-  const H = preview.naturalHeight;
+  const W =
+    preview.naturalWidth;
+
+  const H =
+    preview.naturalHeight;
+
 
   if (!W || !H) {
-    throw new Error("Invalid screenshot size");
+
+    throw new Error(
+      "Invalid screenshot size"
+    );
   }
 
-  const targetW = Math.min(700, W);
-  const scale = targetW / W;
 
-  canvas.width = Math.round(W * scale);
-  canvas.height = Math.round(H * scale);
+  const targetW =
+    Math.min(
+      700,
+      W
+    );
+
+
+  const scale =
+    targetW / W;
+
+
+  canvas.width =
+    Math.round(
+      W * scale
+    );
+
+
+  canvas.height =
+    Math.round(
+      H * scale
+    );
+
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
 
   ctx.drawImage(
     preview,
-    0, 0,
+    0,
+    0,
     canvas.width,
     canvas.height
   );
 
-  const imageData = ctx.getImageData(
-    0, 0,
-    canvas.width,
-    canvas.height
-  );
 
-  const data = imageData.data;
+  const imageData =
+    ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
-  let green = 0;
-  let red = 0;
 
-  for (let i = 0; i < data.length; i += 4) {
+  const data =
+    imageData.data;
 
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
+
+  let green =
+    0;
+
+  let red =
+    0;
+
+
+  for (
+    let i = 0;
+    i < data.length;
+    i += 4
+  ) {
+
+    const r =
+      data[i];
+
+    const g =
+      data[i + 1];
+
+    const b =
+      data[i + 2];
+
 
     if (
       g > r * 1.12 &&
       g > b * 0.95 &&
       g > 80
     ) {
+
       green++;
     }
+
 
     if (
       r > g * 1.12 &&
       r > b * 0.95 &&
       r > 80
     ) {
+
       red++;
     }
   }
 
-  let signal = "NO TRADE";
-  let confidence = 0;
 
-  const total = green + red;
+  let signal =
+    "NO TRADE";
+
+  let confidence =
+    0;
+
+
+  const total =
+    green + red;
+
 
   if (total > 0) {
 
-    const diff = Math.abs(green - red);
-    confidence = Math.round((diff / total) * 100);
+    const diff =
+      Math.abs(
+        green - red
+      );
+
+
+    confidence =
+      Math.round(
+        (
+          diff /
+          total
+        ) *
+        100
+      );
+
 
     if (
-      green > red * 1.35 &&
+      green >
+      red * 1.35 &&
       confidence >= 20
     ) {
-      signal = "UP";
+
+      signal =
+        "UP";
     }
 
+
     if (
-      red > green * 1.35 &&
+      red >
+      green * 1.35 &&
       confidence >= 20
     ) {
-      signal = "DOWN";
+
+      signal =
+        "DOWN";
     }
   }
 
+
   showResult({
-    signal: signal,
-    confidence: confidence,
-    count: total,
+
+    signal:
+      signal,
+
+    confidence:
+      confidence,
+
+    count:
+      total,
+
     quality:
-      total > 1000 ? "HIGH" :
-      total > 300 ? "MEDIUM" :
-      "LOW",
-    trend: signal === "UP" ? "BULLISH" :
-           signal === "DOWN" ? "BEARISH" :
-           "MIXED",
-    momentum: signal === "UP" ? "BULLISH" :
-              signal === "DOWN" ? "BEARISH" :
-              "MIXED",
-    structure: "AUTO",
-    pressure: signal,
-    bull: green,
-    bear: red,
+      total > 1000
+      ? "HIGH"
+      : total > 300
+      ? "MEDIUM"
+      : "LOW",
+
+    trend:
+      signal === "UP"
+      ? "BULLISH"
+      : signal === "DOWN"
+      ? "BEARISH"
+      : "MIXED",
+
+    momentum:
+      signal === "UP"
+      ? "BULLISH"
+      : signal === "DOWN"
+      ? "BEARISH"
+      : "MIXED",
+
+    structure:
+      "AUTO",
+
+    pressure:
+      signal,
+
+    bull:
+      green,
+
+    bear:
+      red,
+
     reasons: [
       "Screenshot successfully analyzed",
       "Green pixels: " + green,
@@ -194,58 +653,161 @@ function runSimpleAnalysis() {
     ]
   });
 
-  statusBox.textContent = "✅ Analysis complete";
+
+  statusBox.textContent =
+    "✅ Analysis complete";
 }
 
+
+/* =========================
+   SHOW RESULT
+========================= */
 
 function showResult(r) {
 
-  const resultBox = document.getElementById("result");
-  const signal = document.getElementById("signal");
+  const resultBox =
+    document.getElementById(
+      "result"
+    );
 
-  resultBox.style.display = "block";
 
-  signal.textContent = r.signal;
-  signal.className = "";
+  const signal =
+    document.getElementById(
+      "signal"
+    );
 
-  if (r.signal === "UP") {
-    signal.classList.add("up");
-  } else if (r.signal === "DOWN") {
-    signal.classList.add("down");
+
+  resultBox.style.display =
+    "block";
+
+
+  signal.textContent =
+    r.signal;
+
+
+  signal.className =
+    "";
+
+
+  if (
+    r.signal === "UP"
+  ) {
+
+    signal.classList.add(
+      "up"
+    );
+
+  } else if (
+    r.signal === "DOWN"
+  ) {
+
+    signal.classList.add(
+      "down"
+    );
+
   } else {
-    signal.classList.add("yellow");
+
+    signal.classList.add(
+      "yellow"
+    );
   }
 
-  document.getElementById("strength").textContent =
-    "Confidence: " + r.confidence + "/100";
 
-  document.getElementById("count").textContent = r.count;
-  document.getElementById("quality").textContent = r.quality;
-  document.getElementById("trend").textContent = r.trend;
-  document.getElementById("momentum").textContent = r.momentum;
-  document.getElementById("structure").textContent = r.structure;
-  document.getElementById("pressure").textContent = r.pressure;
-  document.getElementById("bull").textContent = r.bull;
-  document.getElementById("bear").textContent = r.bear;
+  document.getElementById(
+    "strength"
+  ).textContent =
+    "Confidence: " +
+    r.confidence +
+    "/100";
+
+
+  document.getElementById(
+    "count"
+  ).textContent =
+    r.count;
+
+
+  document.getElementById(
+    "quality"
+  ).textContent =
+    r.quality;
+
+
+  document.getElementById(
+    "trend"
+  ).textContent =
+    r.trend;
+
+
+  document.getElementById(
+    "momentum"
+  ).textContent =
+    r.momentum;
+
+
+  document.getElementById(
+    "structure"
+  ).textContent =
+    r.structure;
+
+
+  document.getElementById(
+    "pressure"
+  ).textContent =
+    r.pressure;
+
+
+  document.getElementById(
+    "bull"
+  ).textContent =
+    r.bull;
+
+
+  document.getElementById(
+    "bear"
+  ).textContent =
+    r.bear;
+
 
   const confirmations =
-    document.getElementById("confirmations");
+    document.getElementById(
+      "confirmations"
+    );
 
-  confirmations.innerHTML = "";
 
-  r.reasons.forEach(function (reason) {
+  confirmations.innerHTML =
+    "";
 
-    const span =
-      document.createElement("span");
 
-    span.className = "tag";
-    span.textContent = reason;
+  r.reasons.forEach(
+    function (reason) {
 
-    confirmations.appendChild(span);
-  });
+      const span =
+        document.createElement(
+          "span"
+        );
+
+
+      span.className =
+        "tag";
+
+
+      span.textContent =
+        reason;
+
+
+      confirmations.appendChild(
+        span
+      );
+    }
+  );
+
 
   resultBox.scrollIntoView({
-    behavior: "smooth"
+    behavior:"smooth"
   });
 }
-  </script>
+</script>
+
+</body>
+</html>
