@@ -9,16 +9,25 @@ chrome.action.onClicked.addListener(async (tab) => {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg?.type === "CAPTURE_VISIBLE") {
     chrome.tabs.captureVisibleTab(
-      sender.tab.windowId,
+      null,
       {
         format: "jpeg",
         quality: 70
       },
       (dataUrl) => {
+        if (chrome.runtime.lastError) {
+          sendResponse({
+            ok: false,
+            dataUrl: null,
+            error: chrome.runtime.lastError.message
+          });
+          return;
+        }
+
         sendResponse({
-          ok: !chrome.runtime.lastError,
-          dataUrl,
-          error: chrome.runtime.lastError?.message
+          ok: true,
+          dataUrl: dataUrl,
+          error: null
         });
       }
     );
