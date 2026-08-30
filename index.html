@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Trade Analyzer</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #10151c;
+      color: white;
+    }
+
+    .app {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .sub {
+      text-align: center;
+      color: #9ca7b5;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: #1b222c;
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: bold;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #394452;
+      background: #111820;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      padding: 16px;
+      margin-top: 18px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #20c875;
+      color: white;
+    }
+
+    #result {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    #details {
+      line-height: 1.6;
+      color: #d2d8df;
+    }
+
+    .warning {
+      font-size: 13px;
+      color: #f0bd5b;
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>📊 Trade Analyzer</h1>
+  <div class="sub">Mobile Market Analysis Helper</div>
+
+  <div class="card">
+
+    <label>Market Trend</label>
+    <select id="trend">
+      <option value="down">Strong Downtrend</option>
+      <option value="up">Strong Uptrend</option>
+      <option value="side">Sideways / Unclear</option>
+    </select>
+
+    <label>Recent Candle</label>
+    <select id="candle">
+      <option value="red">Red / Bearish</option>
+      <option value="green">Green / Bullish</option>
+      <option value="neutral">Small / Doji</option>
+    </select>
+
+    <label>RSI</label>
+    <input id="rsi" type="number" value="50" min="0" max="100">
+
+    <label>Price Location</label>
+    <select id="zone">
+      <option value="normal">Normal area</option>
+      <option value="support">Near Support</option>
+      <option value="resistance">Near Resistance</option>
+    </select>
+
+    <button onclick="analyze()">ANALYZE</button>
+
+  </div>
+
+  <div class="card">
+
+    <div id="result">WAIT</div>
+
+    <div id="details">
+      তথ্য দিয়ে ANALYZE চাপুন।
+    </div>
+
+  </div>
+
+  <div class="warning">
+    ⚠️ Educational tool only. 1-minute/binary trades are highly risky.
+    কোনো signal নিশ্চিত লাভের guarantee নয়।
+  </div>
+
+</div>
+
+<script>
+
+function analyze() {
+
+  const trend = document.getElementById("trend").value;
+  const candle = document.getElementById("candle").value;
+  const rsi = Number(document.getElementById("rsi").value);
+  const zone = document.getElementById("zone").value;
+
+  let up = 0;
+  let down = 0;
+  let reasons = [];
+
+  if (trend === "up") {
+    up += 3;
+    reasons.push("✓ Main trend bullish");
+  }
+
+  if (trend === "down") {
+    down += 3;
+    reasons.push("✓ Main trend bearish");
+  }
+
+  if (trend === "side") {
+    reasons.push("⚠ Trend unclear");
+  }
+
+  if (candle === "green") {
+    up += 1;
+    reasons.push("✓ Recent candle bullish");
+  }
+
+  if (candle === "red") {
+    down += 1;
+    reasons.push("✓ Recent candle bearish");
+  }
+
+  if (candle === "neutral") {
+    reasons.push("⚠ Candle indecision");
+  }
+
+  if (rsi <= 30) {
+    up += 2;
+    reasons.push("✓ RSI oversold");
+  }
+  else if (rsi >= 70) {
+    down += 2;
+    reasons.push("✓ RSI overbought");
+  }
+  else {
+    reasons.push("• RSI neutral: " + rsi);
+  }
+
+  if (zone === "support") {
+    up += 2;
+    reasons.push("✓ Price near support");
+  }
+
+  if (zone === "resistance") {
+    down += 2;
+    reasons.push("✓ Price near resistance");
+  }
+
+  let signal = "WAIT";
+  let color = "#f0bd5b";
+
+  const difference = Math.abs(up - down);
+
+  if (up > down && difference >= 3) {
+    signal = "▲ UP BIAS";
+    color = "#20c875";
+  }
+
+  if (down > up && difference >= 3) {
+    signal = "▼ DOWN BIAS";
+    color = "#ff4d5e";
+  }
+
+  document.getElementById("result").innerText = signal;
+  document.getElementById("result").style.color = color;
+
+  document.getElementById("details").innerHTML =
+    reasons.join("<br>") +
+    "<br><br><b>UP score:</b> " + up +
+    " &nbsp; | &nbsp; <b>DOWN score:</b> " + down;
+
+}
+
+</script>
+
+</body>
+</html>
