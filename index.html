@@ -3,48 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>Screenshot Analyzer V6.1</title>
+<title>Screenshot Analyzer V6.2</title>
 
 <style>
 *{box-sizing:border-box}
-
 body{
   margin:0;
   padding:14px;
   background:#071019;
   color:#fff;
-  font-family:Arial,sans-serif;
+  font-family:Arial,sans-serif
 }
-
-.wrap{
-  max-width:780px;
-  margin:auto;
-}
-
+.wrap{max-width:780px;margin:auto}
 .card{
   background:#111b26;
   border:1px solid #26384b;
   border-radius:16px;
   padding:14px;
-  margin-bottom:14px;
+  margin-bottom:14px
 }
-
-h1{
-  font-size:23px;
-  margin:4px 0 8px;
-}
-
-p{
-  font-size:13px;
-  color:#9fb1c5;
-  line-height:1.45;
-}
-
-input[type=file]{
-  width:100%;
-  margin:10px 0;
-}
-
+h1{font-size:23px;margin:4px 0 8px}
+p{font-size:13px;color:#9fb1c5;line-height:1.45}
+input[type=file]{width:100%;margin:10px 0}
 button{
   width:100%;
   padding:15px;
@@ -54,60 +34,62 @@ button{
   color:#07111e;
   font-size:17px;
   font-weight:900;
-  margin-top:10px;
+  margin-top:10px
 }
+button:disabled{opacity:.45}
 
-button:disabled{
-  opacity:.45;
-}
-
-#previewCanvas{
-  width:100%;
+.previewWrap{
+  position:relative;
   display:none;
-  border-radius:12px;
-  border:1px solid #2b3c50;
   margin-top:10px;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid #2b3c50
+}
+.previewWrap img{
+  display:block;
+  width:100%;
+  height:auto
+}
+.shade{
+  position:absolute;
+  background:rgba(0,0,0,.52);
+  pointer-events:none
+}
+.cropRect{
+  position:absolute;
+  border:3px solid #55a7ff;
+  pointer-events:none
 }
 
 .cropBox{
+  display:none;
   margin-top:12px;
   background:#0d1620;
   border-radius:12px;
-  padding:12px;
+  padding:12px
 }
-
-.sliderRow{
-  margin:10px 0;
-}
-
+.sliderRow{margin:10px 0}
 .sliderRow label{
   display:flex;
   justify-content:space-between;
   font-size:12px;
-  color:#a9bad0;
+  color:#a9bad0
 }
+.sliderRow input{width:100%}
 
-.sliderRow input{
-  width:100%;
-}
-
-.result{
-  display:none;
-}
-
+.result{display:none}
 .signal{
   text-align:center;
   background:#172330;
   border-radius:14px;
-  padding:18px;
+  padding:18px
 }
-
 #direction{
   font-size:38px;
   font-weight:900;
-  margin:8px 0;
+  margin:8px 0
 }
-
 .green{color:#52df8d}
 .red{color:#ff6c6c}
 .yellow{color:#ffd166}
@@ -116,39 +98,27 @@ button:disabled{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:9px;
-  margin-top:12px;
+  margin-top:12px
 }
-
 .box{
   background:#172330;
   padding:11px;
-  border-radius:11px;
+  border-radius:11px
 }
-
-.label{
-  font-size:12px;
-  color:#91a6bd;
-}
-
-.value{
-  font-size:16px;
-  font-weight:800;
-  margin-top:4px;
-}
-
+.label{font-size:12px;color:#91a6bd}
+.value{font-size:16px;font-weight:800;margin-top:4px}
 .tag{
   display:inline-block;
   padding:6px 9px;
   margin:3px;
   border-radius:999px;
   background:#1d2c3c;
-  font-size:12px;
+  font-size:12px
 }
-
 .note{
   font-size:11px;
   line-height:1.5;
-  color:#8497ac;
+  color:#8497ac
 }
 </style>
 </head>
@@ -159,19 +129,29 @@ button:disabled{
 
 <div class="card">
 
-<h1>📸 Screenshot Analyzer V6.1</h1>
+<h1>📸 Screenshot Analyzer V6.2</h1>
 
 <p>
-Screenshot upload করো। Blue box-এর ভিতরে candle chart রাখো।
-V6.1 latest 3–5 candles, trend, momentum, structure, wick rejection,
-patterns, breakout/fakeout, volatility এবং confluence একসাথে দেখে।
+Screenshot select করলে preview সাথে সাথে আসবে।
+Blue box-এর ভিতরে শুধু chart candles রাখো।
 </p>
 
 <input id="file" type="file" accept="image/*">
 
-<canvas id="previewCanvas"></canvas>
+<div id="previewWrap" class="previewWrap">
 
-<div id="cropControls" class="cropBox" style="display:none">
+<img id="preview" alt="preview">
+
+<div id="shadeTop" class="shade"></div>
+<div id="shadeBottom" class="shade"></div>
+<div id="shadeLeft" class="shade"></div>
+<div id="shadeRight" class="shade"></div>
+
+<div id="cropRect" class="cropRect"></div>
+
+</div>
+
+<div id="cropControls" class="cropBox">
 
 <div class="sliderRow">
 <label>
@@ -205,10 +185,6 @@ patterns, breakout/fakeout, volatility এবং confluence একসাথে �
 <input id="right" type="range" min="55" max="100" value="94">
 </div>
 
-<p style="margin-bottom:0">
-Slider নড়ালে blue crop box live নড়বে।
-</p>
-
 </div>
 
 <button id="analyze" disabled>
@@ -235,7 +211,6 @@ Evidence Strength: --
 </div>
 
 </div>
-
 
 <div class="grid">
 
@@ -296,10 +271,8 @@ Evidence Strength: --
 
 </div>
 
-
 <div class="card note">
-Evidence Strength detected evidence alignment score।
-এটা guaranteed win probability নয়।
+Evidence Strength evidence alignment score; guaranteed win probability নয়।
 </div>
 
 </div>
@@ -310,104 +283,252 @@ Evidence Strength detected evidence alignment score।
 
 <script>
 
-const file =
-document.getElementById("file");
+(function(){
 
-const previewCanvas =
-document.getElementById("previewCanvas");
+'use strict';
 
-const pctx =
-previewCanvas.getContext("2d");
+const $ =
+id => document.getElementById(id);
 
-const workCanvas =
-document.getElementById("workCanvas");
+const file = $('file');
 
-const wctx =
-workCanvas.getContext(
-  "2d",
-  {willReadFrequently:true}
-);
+const preview = $('preview');
 
-const analyzeBtn =
-document.getElementById("analyze");
+const previewWrap =
+$('previewWrap');
 
 const cropControls =
-document.getElementById("cropControls");
+$('cropControls');
 
-const topSlider =
-document.getElementById("top");
+const analyzeBtn =
+$('analyze');
 
-const bottomSlider =
-document.getElementById("bottom");
+const topS = $('top');
 
-const leftSlider =
-document.getElementById("left");
+const bottomS = $('bottom');
 
-const rightSlider =
-document.getElementById("right");
+const leftS = $('left');
+
+const rightS = $('right');
+
+const workCanvas =
+$('workCanvas');
+
+const ctx =
+workCanvas.getContext(
+  '2d',
+  {willReadFrequently:true}
+);
 
 let sourceImage=null;
 
 
-function clamp(v,a,b){
-  return Math.max(a,Math.min(b,v));
-}
+const clamp =
+(v,a,b)=>
+Math.max(
+  a,
+  Math.min(b,v)
+);
 
-function avg(a){
-  return a.length
-  ?a.reduce((x,y)=>x+y,0)/a.length
-  :0;
-}
 
-function median(a){
+const avg =
+a =>
+a.length
+?a.reduce(
+  (x,y)=>x+y,
+  0
+)/a.length
+:0;
 
-  if(!a.length)return 0;
 
-  const b=[...a].sort((x,y)=>x-y);
+const median =
+a => {
 
-  const m=
-  Math.floor(b.length/2);
+  if(!a.length)
+  return 0;
+
+  const b =
+  [...a].sort(
+    (x,y)=>x-y
+  );
+
+  const m =
+  Math.floor(
+    b.length/2
+  );
 
   return b.length%2
   ?b[m]
   :(b[m-1]+b[m])/2;
-}
+};
 
-function std(a){
 
-  if(a.length<2)return 0;
+const std =
+a => {
 
-  const m=avg(a);
+  if(a.length<2)
+  return 0;
+
+  const m =
+  avg(a);
 
   return Math.sqrt(
     avg(
       a.map(
-        x=>(x-m)*(x-m)
+        x=>
+        (x-m)*(x-m)
       )
     )
   );
+};
+
+
+const uniq =
+a =>
+[...new Set(a)];
+
+
+
+function updateCrop(){
+
+  if(
+    +bottomS.value
+    <=
+    +topS.value+10
+  ){
+
+    bottomS.value=
+    Math.min(
+      100,
+      +topS.value+10
+    );
+  }
+
+
+  if(
+    +rightS.value
+    <=
+    +leftS.value+20
+  ){
+
+    rightS.value=
+    Math.min(
+      100,
+      +leftS.value+20
+    );
+  }
+
+
+  $('topVal').textContent=
+  topS.value+'%';
+
+  $('bottomVal').textContent=
+  bottomS.value+'%';
+
+  $('leftVal').textContent=
+  leftS.value+'%';
+
+  $('rightVal').textContent=
+  rightS.value+'%';
+
+
+  const T =
+  +topS.value;
+
+  const B =
+  +bottomS.value;
+
+  const L =
+  +leftS.value;
+
+  const R =
+  +rightS.value;
+
+
+  const rect =
+  $('cropRect');
+
+
+  rect.style.left=
+  L+'%';
+
+  rect.style.top=
+  T+'%';
+
+  rect.style.width=
+  (R-L)+'%';
+
+  rect.style.height=
+  (B-T)+'%';
+
+
+  const st =
+  $('shadeTop');
+
+  const sb =
+  $('shadeBottom');
+
+  const sl =
+  $('shadeLeft');
+
+  const sr =
+  $('shadeRight');
+
+
+  st.style.left='0';
+  st.style.top='0';
+  st.style.width='100%';
+  st.style.height=T+'%';
+
+
+  sb.style.left='0';
+  sb.style.top=B+'%';
+  sb.style.width='100%';
+  sb.style.height=(100-B)+'%';
+
+
+  sl.style.left='0';
+  sl.style.top=T+'%';
+  sl.style.width=L+'%';
+  sl.style.height=(B-T)+'%';
+
+
+  sr.style.left=R+'%';
+  sr.style.top=T+'%';
+  sr.style.width=(100-R)+'%';
+  sr.style.height=(B-T)+'%';
+
 }
 
-function unique(a){
-  return [...new Set(a)];
-}
+
+[
+  topS,
+  bottomS,
+  leftS,
+  rightS
+]
+.forEach(
+s =>
+s.addEventListener(
+  'input',
+  updateCrop
+)
+);
 
 
-/* ===========================
-   MOBILE UPLOAD FIX
-=========================== */
+
+/* UPLOAD */
 
 file.addEventListener(
-"change",
+'change',
 function(){
 
-  const selectedFile =
+  const f =
   file.files &&
   file.files[0];
 
-  if(!selectedFile){
 
-    sourceImage=null;
+  if(!f){
 
     analyzeBtn.disabled=true;
 
@@ -417,337 +538,112 @@ function(){
 
   analyzeBtn.disabled=true;
 
-  analyzeBtn.innerText=
-  "LOADING...";
+  analyzeBtn.textContent=
+  'LOADING...';
 
 
-  const objectURL =
-  URL.createObjectURL(
-    selectedFile
-  );
+  const reader =
+  new FileReader();
 
 
-  const img =
-  new Image();
+  reader.onload =
+  function(e){
 
 
-  img.onload=function(){
+    preview.onload =
+    function(){
 
-    sourceImage=img;
+      sourceImage=
+      preview;
 
-    previewCanvas.style.display=
-    "block";
+      previewWrap.style.display=
+      'block';
 
-    cropControls.style.display=
-    "block";
+      cropControls.style.display=
+      'block';
 
+      updateCrop();
 
-    updateLabels();
+      analyzeBtn.disabled=
+      false;
 
-    drawPreview();
+      analyzeBtn.textContent=
+      'DEEP ANALYZE';
 
-
-    analyzeBtn.disabled=false;
-
-    analyzeBtn.innerText=
-    "DEEP ANALYZE";
-
-
-    setTimeout(
-      function(){
-
-        drawPreview();
-
-      },
-      150
-    );
+    };
 
 
-    setTimeout(
-      function(){
+    preview.onerror =
+    function(){
 
-        drawPreview();
+      sourceImage=null;
 
-      },
-      500
-    );
+      previewWrap.style.display=
+      'none';
+
+      cropControls.style.display=
+      'none';
+
+      analyzeBtn.disabled=
+      true;
+
+      analyzeBtn.textContent=
+      'DEEP ANALYZE';
+
+      alert(
+        'Screenshot load হয়নি।'
+      );
+
+    };
 
 
-    URL.revokeObjectURL(
-      objectURL
-    );
+    preview.src=
+    e.target.result;
+
   };
 
 
-  img.onerror=function(){
-
-    URL.revokeObjectURL(
-      objectURL
-    );
-
-
-    sourceImage=null;
-
-    previewCanvas.style.display=
-    "none";
-
-    cropControls.style.display=
-    "none";
-
-    analyzeBtn.disabled=true;
-
-    analyzeBtn.innerText=
-    "DEEP ANALYZE";
-
-
-    alert(
-      "Screenshot load হয়নি। অন্য screenshot try করো।"
-    );
-  };
-
-
-  img.src=
-  objectURL;
-
-});
-
-
-/* ===========================
-   CROP SLIDERS
-=========================== */
-
-[
-  topSlider,
-  bottomSlider,
-  leftSlider,
-  rightSlider
-]
-.forEach(
-slider=>{
-
-  slider.addEventListener(
-  "input",
+  reader.onerror =
   function(){
 
-    fixCrop();
+    analyzeBtn.disabled=
+    true;
 
-    updateLabels();
+    analyzeBtn.textContent=
+    'DEEP ANALYZE';
 
-    drawPreview();
+    alert(
+      'File read error.'
+    );
 
-  });
+  };
+
+
+  reader.readAsDataURL(
+    f
+  );
 
 });
 
 
-function fixCrop(){
-
-  if(
-    +bottomSlider.value
-    <=
-    +topSlider.value+10
-  ){
-
-    bottomSlider.value=
-    Math.min(
-      100,
-      +topSlider.value+10
-    );
-  }
-
-
-  if(
-    +rightSlider.value
-    <=
-    +leftSlider.value+20
-  ){
-
-    rightSlider.value=
-    Math.min(
-      100,
-      +leftSlider.value+20
-    );
-  }
-}
-
-
-function updateLabels(){
-
-  document.getElementById(
-    "topVal"
-  ).innerText=
-  topSlider.value+"%";
-
-
-  document.getElementById(
-    "bottomVal"
-  ).innerText=
-  bottomSlider.value+"%";
-
-
-  document.getElementById(
-    "leftVal"
-  ).innerText=
-  leftSlider.value+"%";
-
-
-  document.getElementById(
-    "rightVal"
-  ).innerText=
-  rightSlider.value+"%";
-}
-
-
-function drawPreview(){
-
-  if(!sourceImage)return;
-
-
-  const maxWidth=
-  900;
-
-
-  const scale=
-  Math.min(
-    1,
-    maxWidth/
-    sourceImage.width
-  );
-
-
-  previewCanvas.width=
-  Math.round(
-    sourceImage.width*
-    scale
-  );
-
-
-  previewCanvas.height=
-  Math.round(
-    sourceImage.height*
-    scale
-  );
-
-
-  const W=
-  previewCanvas.width;
-
-
-  const H=
-  previewCanvas.height;
-
-
-  pctx.clearRect(
-    0,0,W,H
-  );
-
-
-  pctx.drawImage(
-    sourceImage,
-    0,0,W,H
-  );
-
-
-  const x=
-  W*(
-    +leftSlider.value/
-    100
-  );
-
-
-  const y=
-  H*(
-    +topSlider.value/
-    100
-  );
-
-
-  const right=
-  W*(
-    +rightSlider.value/
-    100
-  );
-
-
-  const bottom=
-  H*(
-    +bottomSlider.value/
-    100
-  );
-
-
-  pctx.save();
-
-
-  pctx.fillStyle=
-  "rgba(0,0,0,.55)";
-
-
-  pctx.fillRect(
-    0,0,
-    W,y
-  );
-
-
-  pctx.fillRect(
-    0,bottom,
-    W,H-bottom
-  );
-
-
-  pctx.fillRect(
-    0,y,
-    x,bottom-y
-  );
-
-
-  pctx.fillRect(
-    right,y,
-    W-right,
-    bottom-y
-  );
-
-
-  pctx.strokeStyle=
-  "#55a7ff";
-
-
-  pctx.lineWidth=
-  4;
-
-
-  pctx.strokeRect(
-    x,
-    y,
-    right-x,
-    bottom-y
-  );
-
-
-  pctx.restore();
-}
-
-
-
-/* ===========================
-   ANALYZE BUTTON
-=========================== */
 
 analyzeBtn.addEventListener(
-"click",
+'click',
 function(){
 
-  if(!sourceImage)return;
+  if(!sourceImage)
+  return;
 
 
-  analyzeBtn.disabled=true;
+  analyzeBtn.disabled=
+  true;
 
-  analyzeBtn.innerText=
-  "ANALYZING...";
+  analyzeBtn.textContent=
+  'ANALYZING...';
 
 
   setTimeout(
-  function(){
+  ()=>{
 
     try{
 
@@ -758,84 +654,82 @@ function(){
       console.error(e);
 
       alert(
-        "Analysis error"
+        'Analysis error.'
       );
+
     }
 
 
-    analyzeBtn.disabled=false;
+    analyzeBtn.disabled=
+    false;
 
-    analyzeBtn.innerText=
-    "DEEP ANALYZE";
+    analyzeBtn.textContent=
+    'DEEP ANALYZE';
 
-  },80);
+  },
+  50);
 
 });
 
 
 
-/* ===========================
-   MAIN ANALYSIS
-=========================== */
-
 function analyze(){
 
-  const L=
-  +leftSlider.value/
-  100;
+  const L =
+  +leftS.value/100;
+
+  const R =
+  +rightS.value/100;
+
+  const T =
+  +topS.value/100;
+
+  const B =
+  +bottomS.value/100;
 
 
-  const R=
-  +rightSlider.value/
-  100;
+  const iw =
+  sourceImage.naturalWidth;
+
+  const ih =
+  sourceImage.naturalHeight;
 
 
-  const T=
-  +topSlider.value/
-  100;
-
-
-  const B=
-  +bottomSlider.value/
-  100;
-
-
-  const sx=
+  const sx =
   Math.round(
-    sourceImage.width*
-    L
+    iw*L
+  );
+
+  const sy =
+  Math.round(
+    ih*T
+  );
+
+  const sw =
+  Math.max(
+    1,
+    Math.round(
+      iw*(R-L)
+    )
+  );
+
+  const sh =
+  Math.max(
+    1,
+    Math.round(
+      ih*(B-T)
+    )
   );
 
 
-  const sy=
-  Math.round(
-    sourceImage.height*
-    T
-  );
-
-
-  const sw=
-  Math.round(
-    sourceImage.width*
-    (R-L)
-  );
-
-
-  const sh=
-  Math.round(
-    sourceImage.height*
-    (B-T)
-  );
-
-
-  const scale=
+  const scale =
   Math.min(
     1,
     1200/sw
   );
 
 
-  workCanvas.width=
+  workCanvas.width =
   Math.max(
     1,
     Math.round(
@@ -844,7 +738,7 @@ function analyze(){
   );
 
 
-  workCanvas.height=
+  workCanvas.height =
   Math.max(
     1,
     Math.round(
@@ -853,7 +747,7 @@ function analyze(){
   );
 
 
-  wctx.clearRect(
+  ctx.clearRect(
     0,
     0,
     workCanvas.width,
@@ -861,7 +755,7 @@ function analyze(){
   );
 
 
-  wctx.drawImage(
+  ctx.drawImage(
     sourceImage,
     sx,sy,sw,sh,
     0,0,
@@ -870,69 +764,57 @@ function analyze(){
   );
 
 
-  const W=
+  const W =
   workCanvas.width;
 
-
-  const H=
+  const H =
   workCanvas.height;
 
 
-  const pixels=
-  wctx.getImageData(
+  const p =
+  ctx.getImageData(
     0,0,W,H
   ).data;
 
 
 
-  /* =======================
-     GREEN / RED DETECTOR
-  ======================= */
+  function type(r,g,b){
 
-  function pixelType(r,g,b){
-
-    const max=
+    const mx =
     Math.max(r,g,b);
 
-
-    const min=
+    const mn =
     Math.min(r,g,b);
 
 
-    if(max<45)
-    return 0;
-
-
-    if(max-min<10)
+    if(
+      mx<45 ||
+      mx-mn<10
+    )
     return 0;
 
 
     if(
-      g>r+8
-      &&
+      g>r+8 &&
       g>b-38
     )
     return 1;
 
 
     if(
-      r>g+8
-      &&
+      r>g+8 &&
       r>b-28
     )
     return -1;
 
 
     return 0;
+
   }
 
 
 
-  /* =======================
-     COLUMN MAP
-  ======================= */
-
-  const columns=[];
+  const cols=[];
 
 
   for(
@@ -941,13 +823,13 @@ function analyze(){
     x++
   ){
 
-    let bullishPixels=0;
+    let bp=0;
 
-    let bearishPixels=0;
+    let rp=0;
 
-    let greenY=[];
+    let top=Infinity;
 
-    let redY=[];
+    let bottom=-Infinity;
 
 
     for(
@@ -956,56 +838,68 @@ function analyze(){
       y++
     ){
 
-      const i=
+      const i =
       (y*W+x)*4;
 
 
-      const c=
-      pixelType(
-        pixels[i],
-        pixels[i+1],
-        pixels[i+2]
+      const c =
+      type(
+        p[i],
+        p[i+1],
+        p[i+2]
       );
 
 
-      if(c===1){
+      if(c){
 
-        bullishPixels++;
+        if(c===1)
+        bp++;
 
-        greenY.push(y);
+        else
+        rp++;
 
-      }else if(c===-1){
 
-        bearishPixels++;
+        top=
+        Math.min(
+          top,
+          y
+        );
 
-        redY.push(y);
+
+        bottom=
+        Math.max(
+          bottom,
+          y
+        );
+
       }
+
     }
 
 
-    columns.push({
+    cols.push({
 
       x,
 
-      bullishPixels,
+      bp,
 
-      bearishPixels,
+      rp,
 
       count:
-      bullishPixels+
-      bearishPixels,
+      bp+rp,
 
-      greenY,
+      top,
 
-      redY
+      bottom
 
     });
+
   }
 
 
 
-  const activeCounts=
-  columns
+  const nz =
+  cols
   .filter(
     c=>c.count>0
   )
@@ -1014,191 +908,148 @@ function analyze(){
   );
 
 
-  const medCount=
-  median(
-    activeCounts
-  );
-
-
-  const minActivity=
+  const threshold =
   Math.max(
     2,
-    medCount*.14
+    median(nz)*.14
   );
 
-
-
-  /* =======================
-     MERGE CANDLE COLUMNS
-  ======================= */
 
   let runs=[];
 
-  let current=null;
+  let cur=null;
 
 
   for(
-    const c of columns
+    const c of cols
   ){
 
-    const ys=
-    c.greenY.concat(
-      c.redY
-    );
-
-
-    const top=
-    ys.length
-    ?Math.min(...ys)
-    :Infinity;
-
-
-    const bottom=
-    ys.length
-    ?Math.max(...ys)
-    :-Infinity;
-
-
-    const height=
-    isFinite(top)
-    ?bottom-top+1
+    const h =
+    isFinite(c.top)
+    ?c.bottom-c.top+1
     :0;
 
 
-    const active=
-    c.count>=minActivity
+    const active =
+    c.count>=threshold
     &&
-    height>=3
+    h>=3
     &&
-    height<=H*.70;
+    h<=H*.7;
 
 
     if(active){
 
-      if(!current){
+      if(!cur){
 
-        current={
+        cur={
 
           start:c.x,
 
           end:c.x,
 
-          bullishPixels:
-          c.bullishPixels,
+          bp:c.bp,
 
-          bearishPixels:
-          c.bearishPixels,
+          rp:c.rp,
 
-          top,
+          top:c.top,
 
-          bottom
+          bottom:c.bottom
 
         };
 
       }else if(
-        c.x-current.end<=2
+        c.x-cur.end<=2
       ){
 
-        current.end=
+        cur.end=
         c.x;
 
+        cur.bp+=
+        c.bp;
 
-        current.bullishPixels+=
-        c.bullishPixels;
+        cur.rp+=
+        c.rp;
 
-
-        current.bearishPixels+=
-        c.bearishPixels;
-
-
-        current.top=
+        cur.top=
         Math.min(
-          current.top,
-          top
+          cur.top,
+          c.top
         );
 
-
-        current.bottom=
+        cur.bottom=
         Math.max(
-          current.bottom,
-          bottom
+          cur.bottom,
+          c.bottom
         );
 
       }else{
 
         runs.push(
-          current
+          cur
         );
 
-
-        current={
+        cur={
 
           start:c.x,
 
           end:c.x,
 
-          bullishPixels:
-          c.bullishPixels,
+          bp:c.bp,
 
-          bearishPixels:
-          c.bearishPixels,
+          rp:c.rp,
 
-          top,
+          top:c.top,
 
-          bottom
+          bottom:c.bottom
 
         };
+
       }
 
-    }else if(current){
+    }else if(cur){
 
       runs.push(
-        current
+        cur
       );
 
-      current=null;
+      cur=null;
+
     }
+
   }
 
 
-  if(current)
-  runs.push(
-    current
-  );
+  if(cur)
+  runs.push(cur);
 
 
-
-  /* =======================
-     UI FILTER
-  ======================= */
 
   runs=
   runs.filter(
   r=>{
 
-    const width=
+    const w =
     r.end-r.start+1;
 
-
-    const height=
+    const h =
     r.bottom-r.top+1;
 
 
     return(
 
-      width>=1
+      w>=1
       &&
-      width<=Math.max(
+      w<=Math.max(
         30,
         W*.04
       )
       &&
-      height>=3
+      h>=3
       &&
-      height<=H*.68
+      h<=H*.68
       &&
-      r.bullishPixels+
-      r.bearishPixels>=4
+      r.bp+r.rp>=4
 
     );
 
@@ -1206,200 +1057,44 @@ function analyze(){
 
 
 
-  /* =======================
-     CANDLE BODY + WICKS
-  ======================= */
+  let candles =
+  runs.map(
+  r=>({
 
-  let candles=[];
+    x:
+    (r.start+r.end)/2,
 
+    dir:
+    r.bp>=r.rp
+    ?1:-1,
 
-  for(
-    const r of runs
-  ){
+    high:
+    r.top,
 
-    const direction=
-    r.bullishPixels
-    >=
-    r.bearishPixels
-    ?1:-1;
+    low:
+    r.bottom,
 
-
-    const width=
-    r.end-r.start+1;
-
-
-    const rowCount={};
-
-
-    for(
-      let x=r.start;
-      x<=r.end;
-      x++
-    ){
-
-      const c=
-      columns[x];
-
-
-      if(!c)continue;
-
-
-      const ys=
-      direction===1
-      ?c.greenY
-      :c.redY;
-
-
-      ys.forEach(
-      y=>{
-
-        rowCount[y]=
-        (rowCount[y]||0)+1;
-
-      });
-
-    }
-
-
-    const denseRows=
-    Object.entries(
-      rowCount
-    )
-    .filter(
-      ([y,n])=>
-      n>=Math.max(
-        1,
-        Math.ceil(
-          width*.35
-        )
-      )
-    )
-    .map(
-      ([y])=>+y
-    );
-
-
-    const high=
-    r.top;
-
-
-    const low=
-    r.bottom;
-
-
-    const bodyTop=
-    denseRows.length
-    ?Math.min(...denseRows)
-    :high;
-
-
-    const bodyBottom=
-    denseRows.length
-    ?Math.max(...denseRows)
-    :low;
-
-
-    const body=
+    range:
     Math.max(
       1,
-      bodyBottom-
-      bodyTop
-    );
+      r.bottom-r.top
+    ),
 
-
-    const range=
+    power:
+    Math.abs(
+      r.bp-r.rp
+    )/
     Math.max(
       1,
-      low-high
-    );
+      r.bp+r.rp
+    )
 
-
-    const open=
-    direction===1
-    ?bodyBottom
-    :bodyTop;
-
-
-    const close=
-    direction===1
-    ?bodyTop
-    :bodyBottom;
-
-
-    const upperWick=
-    Math.max(
-      0,
-      Math.min(
-        open,
-        close
-      )-
-      high
-    );
-
-
-    const lowerWick=
-    Math.max(
-      0,
-      low-
-      Math.max(
-        open,
-        close
-      )
-    );
-
-
-    candles.push({
-
-      x:
-      (r.start+r.end)/2,
-
-      dir:
-      direction,
-
-      high,
-
-      low,
-
-      open,
-
-      close,
-
-      body,
-
-      range,
-
-      upperWick,
-
-      lowerWick,
-
-      bodyRatio:
-      body/range,
-
-      power:
-      Math.abs(
-        r.bullishPixels-
-        r.bearishPixels
-      )/
-      Math.max(
-        1,
-        r.bullishPixels+
-        r.bearishPixels
-      )
-
-    });
-  }
-
-
-  candles.sort(
-    (a,b)=>
-    a.x-b.x
+  }))
+  .sort(
+    (a,b)=>a.x-b.x
   );
 
 
-
-  /* =======================
-     CONTINUOUS CLUSTER
-  ======================= */
 
   if(
     candles.length>=4
@@ -1418,10 +1113,11 @@ function analyze(){
         candles[i].x-
         candles[i-1].x
       );
+
     }
 
 
-    const normalGap=
+    const g =
     Math.max(
       3,
       median(gaps)
@@ -1430,7 +1126,7 @@ function analyze(){
 
     let clusters=[];
 
-    let cluster=[
+    let cl=[
       candles[0]
     ];
 
@@ -1441,35 +1137,34 @@ function analyze(){
       i++
     ){
 
-      const gap=
-      candles[i].x-
-      candles[i-1].x;
-
-
       if(
-        gap<=
-        normalGap*2.8
+        candles[i].x-
+        candles[i-1].x
+        <=
+        g*2.8
       ){
 
-        cluster.push(
+        cl.push(
           candles[i]
         );
 
       }else{
 
         clusters.push(
-          cluster
+          cl
         );
 
-        cluster=[
+        cl=[
           candles[i]
         ];
+
       }
+
     }
 
 
     clusters.push(
-      cluster
+      cl
     );
 
 
@@ -1481,72 +1176,49 @@ function analyze(){
 
     candles=
     clusters[0]||[];
+
   }
+
 
 
   if(
     candles.length>45
-  ){
-
-    candles=
-    candles.slice(-45);
-  }
+  )
+  candles=
+  candles.slice(-45);
 
 
 
-  /* =======================
-     QUALITY
-  ======================= */
-
-  let qualityScore=
+  let q =
   Math.round(
     clamp(
       candles.length/
-      18*78,
+      18*80,
       0,
-      78
+      100
     )
   );
 
 
-  if(
-    candles.length>=10
-  )
-  qualityScore+=12;
+  const quality =
+  q>=75
+  ?'GOOD'
+  :q>=55
+  ?'USABLE'
+  :q>=35
+  ?'WEAK'
+  :'POOR';
 
-
-  if(
-    candles.length>=18
-  )
-  qualityScore+=10;
-
-
-  qualityScore=
-  clamp(
-    qualityScore,
-    0,
-    100
-  );
-
-
-  const quality=
-  qualityScore>=75
-  ?"GOOD"
-  :qualityScore>=55
-  ?"USABLE"
-  :qualityScore>=35
-  ?"WEAK"
-  :"POOR";
 
 
   if(
     candles.length<6
   ){
 
-    showResult({
+    show({
 
       direction:
-      "CROP",
+      'CROP',
 
       strength:
       0,
@@ -1557,22 +1229,22 @@ function analyze(){
       quality,
 
       trend:
-      "UNKNOWN",
+      'UNKNOWN',
 
       momentum:
-      "UNKNOWN",
+      'UNKNOWN',
 
       structure:
-      "UNKNOWN",
+      'UNKNOWN',
 
       immediate:
-      "UNKNOWN",
+      'UNKNOWN',
 
       pattern:
-      "UNKNOWN",
+      'UNKNOWN',
 
       volatility:
-      "UNKNOWN",
+      'UNKNOWN',
 
       bull:
       0,
@@ -1581,46 +1253,38 @@ function analyze(){
       0,
 
       reasons:[
-        "Enough reliable candles detect হয়নি",
-        "Blue crop box candle chart-এর উপর রাখো"
+        'Enough reliable candles detect হয়নি',
+        'Blue crop box candle chart-এর উপর রাখো'
       ]
 
     });
 
+
     return;
+
   }
 
 
 
-  /* =======================
-     ANALYSIS DATA
-  ======================= */
-
-  const recent=
+  const recent =
   candles.slice(-10);
 
 
-  const recent5=
+  const r5 =
   candles.slice(-5);
 
 
-  const recent3=
+  const r3 =
   candles.slice(-3);
 
 
-  const last=
+  const last =
   candles[
     candles.length-1
   ];
 
 
-  const previous=
-  candles[
-    candles.length-2
-  ];
-
-
-  const meanRange=
+  const meanRange =
   Math.max(
     4,
     avg(
@@ -1639,15 +1303,7 @@ function analyze(){
 
 
 
-  /* =======================
-     TREND
-  ======================= */
-
-  let trend=
-  "SIDEWAYS";
-
-
-  const trendSet=
+  const trendSet =
   candles.slice(
     -Math.min(
       16,
@@ -1656,7 +1312,7 @@ function analyze(){
   );
 
 
-  const group=
+  const group =
   Math.max(
     2,
     Math.floor(
@@ -1665,7 +1321,7 @@ function analyze(){
   );
 
 
-  const oldMid=
+  const oldMid =
   avg(
     trendSet
     .slice(0,group)
@@ -1676,7 +1332,7 @@ function analyze(){
   );
 
 
-  const newMid=
+  const newMid =
   avg(
     trendSet
     .slice(-group)
@@ -1687,20 +1343,26 @@ function analyze(){
   );
 
 
-  const move=
+  const move =
   (oldMid-newMid)/
   meanRange;
 
 
-  if(move>.35){
+  let trend =
+  'SIDEWAYS';
+
+
+  if(
+    move>.35
+  ){
 
     trend=
-    "BULLISH";
+    'BULLISH';
 
     bull+=16;
 
     reasons.push(
-      "Overall bullish trend"
+      'Overall bullish trend'
     );
 
   }else if(
@@ -1708,38 +1370,39 @@ function analyze(){
   ){
 
     trend=
-    "BEARISH";
+    'BEARISH';
 
     bear+=16;
 
     reasons.push(
-      "Overall bearish trend"
+      'Overall bearish trend'
     );
+
   }
 
 
 
-  /* =======================
-     HH HL LH LL / CHOCH
-  ======================= */
-
-  let structure=
-  "MIXED";
+  let structure =
+  'MIXED';
 
 
   if(
     candles.length>=8
   ){
 
-    const old=
+    const old =
     candles.slice(-8,-4);
 
 
-    const now=
+    const now =
     candles.slice(-4);
 
 
-    const oldHigh=
+    const tol =
+    meanRange*.08;
+
+
+    const oh =
     avg(
       old.map(
         c=>c.high
@@ -1747,7 +1410,7 @@ function analyze(){
     );
 
 
-    const oldLow=
+    const ol =
     avg(
       old.map(
         c=>c.low
@@ -1755,6 +1418,471 @@ function analyze(){
     );
 
 
-    const newHigh=
+    const nh =
     avg(
-      now.map
+      now.map(
+        c=>c.high
+      )
+    );
+
+
+    const nl =
+    avg(
+      now.map(
+        c=>c.low
+      )
+    );
+
+
+    if(
+      nh<oh-tol
+      &&
+      nl<ol-tol
+    ){
+
+      structure=
+      'HH / HL';
+
+      bull+=16;
+
+      reasons.push(
+        'HH/HL bullish structure'
+      );
+
+    }else if(
+      nh>oh+tol
+      &&
+      nl>ol+tol
+    ){
+
+      structure=
+      'LH / LL';
+
+      bear+=16;
+
+      reasons.push(
+        'LH/LL bearish structure'
+      );
+
+    }else{
+
+      structure=
+      'CHoCH / TRANSITION';
+
+      reasons.push(
+        'Structure transition'
+      );
+
+    }
+
+  }
+
+
+
+  let bp=0;
+
+  let rp=0;
+
+
+  r5.forEach(
+  (c,i)=>{
+
+    const w =
+    1+i*.35;
+
+
+    const v =
+    c.range*
+    c.power*
+    w;
+
+
+    if(
+      c.dir===1
+    )
+    bp+=v;
+
+    else
+    rp+=v;
+
+  });
+
+
+
+  let momentum =
+  'MIXED';
+
+
+  if(
+    bp>rp*1.12
+  ){
+
+    momentum=
+    'BULLISH';
+
+    bull+=18;
+
+    reasons.push(
+      'Recent bullish momentum'
+    );
+
+  }else if(
+    rp>bp*1.12
+  ){
+
+    momentum=
+    'BEARISH';
+
+    bear+=18;
+
+    reasons.push(
+      'Recent bearish momentum'
+    );
+
+  }
+
+
+
+  let immediateScore=
+  0;
+
+
+  r3.forEach(
+  (c,i)=>{
+
+    immediateScore+=
+    (
+      c.dir===1
+      ?1:-1
+    )
+    *
+    (
+      c.range/
+      meanRange
+    )
+    *
+    (
+      1+i*.6
+    );
+
+  });
+
+
+  let immediate=
+  'MIXED';
+
+
+  if(
+    immediateScore>.8
+  ){
+
+    immediate=
+    'BULLISH';
+
+    bull+=22;
+
+    reasons.push(
+      'Immediate 3-candle bias bullish'
+    );
+
+  }else if(
+    immediateScore<-.8
+  ){
+
+    immediate=
+    'BEARISH';
+
+    bear+=22;
+
+    reasons.push(
+      'Immediate 3-candle bias bearish'
+    );
+
+  }
+
+
+
+  let pattern =
+  'No strong pattern';
+
+
+  if(
+    last.range>
+    meanRange*1.7
+  ){
+
+    if(
+      last.dir===1
+    ){
+
+      pattern=
+      'Bullish expansion';
+
+      bull+=10;
+
+      reasons.push(
+        'Bullish expansion candle'
+      );
+
+    }else{
+
+      pattern=
+      'Bearish expansion';
+
+      bear+=10;
+
+      reasons.push(
+        'Bearish expansion candle'
+      );
+
+    }
+
+  }
+
+
+
+  let volatility =
+  'NORMAL';
+
+
+  const ranges =
+  recent.map(
+    c=>c.range
+  );
+
+
+  const cv =
+  avg(ranges)
+  ?
+  std(ranges)/
+  avg(ranges)
+  :0;
+
+
+  if(
+    cv>.7
+  ){
+
+    volatility=
+    'HIGH / SPIKE';
+
+    bull*=.92;
+
+    bear*=.92;
+
+    reasons.push(
+      'High-volatility penalty'
+    );
+
+  }
+
+
+
+  const conflict =
+
+  (
+    trend==='BULLISH'
+    &&
+    immediate==='BEARISH'
+  )
+
+  ||
+
+  (
+    trend==='BEARISH'
+    &&
+    immediate==='BULLISH'
+  )
+
+  ||
+
+  (
+    momentum==='BULLISH'
+    &&
+    immediate==='BEARISH'
+  )
+
+  ||
+
+  (
+    momentum==='BEARISH'
+    &&
+    immediate==='BULLISH'
+  );
+
+
+  if(
+    conflict
+  ){
+
+    bull*=.9;
+
+    bear*=.9;
+
+    reasons.push(
+      'Overall vs immediate conflict'
+    );
+
+  }
+
+
+
+  let direction;
+
+
+  if(
+    immediate==='BULLISH'
+    &&
+    bull>=bear*.82
+  ){
+
+    direction=
+    'UP';
+
+  }else if(
+    immediate==='BEARISH'
+    &&
+    bear>=bull*.82
+  ){
+
+    direction=
+    'DOWN';
+
+  }else{
+
+    direction=
+    bull>bear
+    ?'UP'
+    :bear>bull
+    ?'DOWN'
+    :last.dir===1
+    ?'UP'
+    :'DOWN';
+
+  }
+
+
+
+  const hi =
+  Math.max(
+    bull,
+    bear
+  );
+
+
+  const lo =
+  Math.min(
+    bull,
+    bear
+  );
+
+
+  const sep =
+  (
+    hi-lo
+  )
+  /
+  Math.max(
+    1,
+    hi+lo
+  );
+
+
+  let strength =
+  48
+  +
+  sep*34
+  +
+  Math.min(
+    10,
+    reasons.length
+  )
+  +
+  (
+    q-50
+  )*.08;
+
+
+  if(
+    conflict
+  )
+  strength-=10;
+
+
+  if(
+    volatility!=='NORMAL'
+  )
+  strength-=6;
+
+
+  strength =
+  Math.round(
+    clamp(
+      strength,
+      45,
+      100
+    )
+  );
+
+
+  show({
+
+    direction,
+
+    strength,
+
+    candles:
+    candles.length,
+
+    quality,
+
+    trend,
+
+    momentum,
+
+    structure,
+
+    immediate,
+
+    pattern,
+
+    volatility,
+
+    bull:
+    Math.round(bull),
+
+    bear:
+    Math.round(bear),
+
+    reasons:
+    uniq(reasons)
+
+  });
+
+}
+
+
+
+function show(o){
+
+  $('result').style.display=
+  'block';
+
+
+  const d =
+  $('direction');
+
+
+  if(
+    o.direction==='UP'
+  ){
+
+    d.textContent=
+    'UP ⬆️';
+
+    d.className=
+    'green';
+
+  }else if(
+    o.direction==='DOWN'
+  
